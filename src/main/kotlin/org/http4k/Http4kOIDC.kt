@@ -3,6 +3,9 @@ package org.http4k
 import org.http4k.formats.JacksonMessage
 import org.http4k.formats.jacksonMessageLens
 import org.http4k.client.JavaHttpClient
+import org.http4k.cloudnative.env.Environment
+import org.http4k.cloudnative.env.EnvironmentKey
+import org.http4k.cloudnative.env.Port
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -12,6 +15,7 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.DebuggingFilters.PrintRequest
+import org.http4k.lens.port
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
@@ -58,7 +62,9 @@ val app: HttpHandler = routes(
 fun main() {
     val printingApp: HttpHandler = PrintRequest().then(app)
 
-    val server = printingApp.asServer(Undertow(9000)).start()
+    val port = EnvironmentKey.port().defaulted("PORT", Port(9000))
+
+    val server = printingApp.asServer(Undertow(port(Environment.ENV).value)).start()
 
     println("Server started on " + server.port())
 }

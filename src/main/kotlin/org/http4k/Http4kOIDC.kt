@@ -64,21 +64,20 @@ object Config {
 
 fun main() {
     val environment = Environment.ENV
+    val stack = DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly()
 
-    val client = DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly().then(JavaHttpClient())
+    val client = stack.then(JavaHttpClient())
+
     val oAuthPersistence = InsecureCookieBasedOAuthPersistence("http4k-oidc")
 
     val oauthProvider = OAuthProvider.oidcAuthServer(
         client,
-        clientSecret(environment).use { secret ->
-            Credentials("http4k-oidc", secret)
-        },
+        clientSecret(environment).use { secret -> Credentials("http4k-oidc", secret) },
         baseUri(environment).extend(Uri.of("/oauth/callback")),
         oAuthPersistence
     )
 
-    val printingApp =
-        DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly().then(app(oauthProvider, oAuthPersistence, client))
+    val printingApp = stack.then(app(oauthProvider, oAuthPersistence, client))
 
     val server = printingApp.asServer(Undertow(port(environment).value)).start()
 

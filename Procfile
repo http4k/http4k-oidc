@@ -1,1 +1,1 @@
-web: build/install/Http4kOIDC/bin/Http4kOIDC $PORT
+web: build/install/http4k-oidc/bin/http4k-oidc $PORT

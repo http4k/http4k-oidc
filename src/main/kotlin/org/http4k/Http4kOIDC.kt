@@ -24,9 +24,11 @@ import org.http4k.server.Undertow
 import org.http4k.server.asServer
 
 
-private val oAuthPersistence = InsecureCookieBasedOAuthPersistence("http4k-oidc")
-
-fun app(oauthProvider: OAuthProvider, client: HttpHandler): HttpHandler = routes(
+fun app(
+    oauthProvider: OAuthProvider,
+    oAuthPersistence: InsecureCookieBasedOAuthPersistence,
+    client: HttpHandler
+): HttpHandler = routes(
 
     "/health" bind GET to { Response(OK) },
 
@@ -64,6 +66,7 @@ fun main() {
     val environment = Environment.ENV
 
     val client = DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly().then(JavaHttpClient())
+    val oAuthPersistence = InsecureCookieBasedOAuthPersistence("http4k-oidc")
 
     val oauthProvider = OAuthProvider.oidcAuthServer(
         client,
@@ -74,7 +77,8 @@ fun main() {
         oAuthPersistence
     )
 
-    val printingApp = DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly().then(app(oauthProvider, client))
+    val printingApp =
+        DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly().then(app(oauthProvider, oAuthPersistence, client))
 
     val server = printingApp.asServer(Undertow(port(environment).value)).start()
 

@@ -1,7 +1,7 @@
 package org.http4k
 
 import org.http4k.Config.baseUri
-import org.http4k.Config.clientSecret
+import org.http4k.Config.oauthCredentials
 import org.http4k.Config.port
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Environment
@@ -58,7 +58,9 @@ fun app(
 object Config {
     val port = EnvironmentKey.port().defaulted("PORT", Port(9000))
     val baseUri = EnvironmentKey.uri().defaulted("BASE_URI", Uri.of("http://localhost:9000"))
-    val clientSecret = EnvironmentKey.secret().required("CLIENT_SECRET")
+    val oauthCredentials = EnvironmentKey.secret()
+        .map { it.use { secret -> Credentials("http4k-oidc", secret) } }
+        .required("CLIENT_SECRET")
 }
 
 
@@ -72,13 +74,12 @@ fun main() {
 
     val oauthProvider = OAuthProvider.oidcAuthServer(
         client,
-        clientSecret(environment).use { secret -> Credentials("http4k-oidc", secret) },
+        oauthCredentials(environment),
         baseUri(environment).extend(Uri.of("/oauth/callback")),
         oAuthPersistence
     )
 
     val printingApp = stack.then(app(oauthProvider, oAuthPersistence, client))
-
     val server = printingApp.asServer(Undertow(port(environment).value)).start()
 
     println("Server started on " + server.port())

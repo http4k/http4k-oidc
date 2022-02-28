@@ -41,6 +41,8 @@ val oauthProvider = OAuthProvider.google(
         oAuthPersistence
 )
 val app: HttpHandler = routes(
+    "/health" bind GET to { Response(OK) },
+
     "/ping" bind GET to {
         Response(OK).body("pong")
     },

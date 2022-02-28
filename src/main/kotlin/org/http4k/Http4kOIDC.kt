@@ -1,72 +1,116 @@
 package org.http4k
 
-import org.http4k.formats.JacksonMessage
-import org.http4k.formats.jacksonMessageLens
+import org.http4k.Config.baseUri
+import org.http4k.Config.clientSecret
+import org.http4k.Config.port
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.cloudnative.env.Port
-import org.http4k.core.Credentials
-import org.http4k.core.HttpHandler
+import org.http4k.core.*
 import org.http4k.core.Method.GET
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
-import org.http4k.core.then
-import org.http4k.core.with
-import org.http4k.filter.DebuggingFilters.PrintRequest
+import org.http4k.filter.ClientFilters
+import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.inIntelliJOnly
 import org.http4k.lens.port
+import org.http4k.lens.secret
+import org.http4k.lens.uri
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.security.InsecureCookieBasedOAuthPersistence
-import org.http4k.security.OAuthProvider
-import org.http4k.security.google
+import org.http4k.security.*
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
 
-// Google OAuth Example
-// Browse to: http://localhost:9000/oauth - you'll be redirected to google for authentication
-val googleClientId = "myGoogleClientId"
-val googleClientSecret = "myGoogleClientSecret"
 
-// this is a test implementation of the OAuthPersistence interface, which should be
-// implemented by application developers
-val oAuthPersistence = InsecureCookieBasedOAuthPersistence("Google")
+private val oAuthPersistence = InsecureCookieBasedOAuthPersistence("http4k-oidc")
 
-// pre-defined configuration exist for common OAuth providers
-val oauthProvider = OAuthProvider.google(
-        JavaHttpClient(),
-        Credentials(googleClientId, googleClientSecret),
-        Uri.of("http://localhost:9000/oauth/callback"),
-        oAuthPersistence
-)
-val app: HttpHandler = routes(
+fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
+
+class BasicAuthAccessTokenFetcherAuthenticator(private val providerConfig: OAuthProviderConfig) :
+    AccessTokenFetcherAuthenticator {
+    override fun authenticate(request: Request) =
+        request.header("Authorization", "Basic ${providerConfig.credentials.base64Encoded()}")
+}
+
+
+fun OAuthProvider.Companion.oidcAuthServer(
+    client: HttpHandler,
+    credentials: Credentials,
+    callbackUri: Uri,
+    oAuthPersistence: OAuthPersistence,
+    scopes: List<String> = listOf("openid")
+): OAuthProvider {
+    val providerConfig = OAuthProviderConfig(
+        Uri.of("https://www.certification.openid.net"),
+        "/test/a/http4k-oidc/authorize",
+        "/test/a/http4k-oidc/token",
+        credentials
+    )
+    return OAuthProvider(
+        providerConfig,
+        client,
+        callbackUri,
+        scopes,
+        oAuthPersistence,
+        { it.query("nonce", CrossSiteRequestForgeryToken.SECURE_CSRF().value) },
+        CrossSiteRequestForgeryToken.SECURE_CSRF,
+        accessTokenFetcherAuthenticator = BasicAuthAccessTokenFetcherAuthenticator(providerConfig)
+    )
+}
+
+
+fun app(oauthProvider: OAuthProvider, client: HttpHandler): HttpHandler = routes(
+
     "/health" bind GET to { Response(OK) },
 
     "/ping" bind GET to {
         Response(OK).body("pong")
     },
 
-    "/formats/json/jackson" bind GET to {
-        Response(OK).with(jacksonMessageLens of JacksonMessage("Barry", "Hello there!"))
-    },
-
-    "/testing/hamkrest" bind GET to {request ->
-        Response(OK).body("Echo '${request.bodyString()}'")
-    },
-
     "/oauth" bind routes(
-            "/" bind GET to oauthProvider.authFilter.then { Response(OK).body("hello!") },
-            "/callback" bind GET to oauthProvider.callback
+        "/" bind GET to oauthProvider.authFilter.then {
+            val authenticatedClient =
+                ClientFilters.BearerAuth(oAuthPersistence.retrieveToken(it)?.value ?: error("not authenticated"))
+                    .then(client)
+
+            val userInfo = authenticatedClient(
+                Request(
+                    GET,
+                    oauthProvider.providerConfig.apiBase.extend(Uri.of("/test/a/http4k-oidc/userinfo"))
+                )
+            ).bodyString()
+
+            Response(OK).body(userInfo)
+        },
+        "/callback" bind GET to oauthProvider.callback
     )
 )
 
-fun main() {
-    val printingApp: HttpHandler = PrintRequest().then(app)
-
+object Config {
     val port = EnvironmentKey.port().defaulted("PORT", Port(9000))
+    val baseUri = EnvironmentKey.uri().defaulted("BASE_URI", Uri.of("http://localhost:9000"))
+    val clientSecret = EnvironmentKey.secret().required("CLIENT_SECRET")
+}
 
-    val server = printingApp.asServer(Undertow(port(Environment.ENV).value)).start()
+
+fun main() {
+    val environment = Environment.ENV
+
+    val client = DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly().then(JavaHttpClient())
+
+    val oauthProvider = OAuthProvider.oidcAuthServer(
+        client,
+        clientSecret(environment).use { secret ->
+            Credentials("http4k-oidc", secret)
+        },
+        baseUri(environment).extend(Uri.of("/oauth/callback")),
+        oAuthPersistence
+    )
+
+    val printingApp = DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly().then(app(oauthProvider, client))
+
+    val server = printingApp.asServer(Undertow(port(environment).value)).start()
 
     println("Server started on " + server.port())
 }

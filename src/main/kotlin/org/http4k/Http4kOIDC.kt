@@ -28,14 +28,8 @@ fun app(
     oauthProvider: OAuthProvider,
     oAuthPersistence: InsecureCookieBasedOAuthPersistence,
     client: HttpHandler
-): HttpHandler = routes(
-
+) = routes(
     "/health" bind GET to { Response(OK) },
-
-    "/ping" bind GET to {
-        Response(OK).body("pong")
-    },
-
     "/oauth" bind routes(
         "/" bind GET to oauthProvider.authFilter.then {
             val authenticatedClient =
@@ -62,7 +56,6 @@ object Config {
         .map { it.use { secret -> Credentials("http4k-oidc", secret) } }
         .required("CLIENT_SECRET")
 }
-
 
 fun main() {
     val environment = Environment.ENV

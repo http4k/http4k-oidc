@@ -18,47 +18,13 @@ import org.http4k.lens.secret
 import org.http4k.lens.uri
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.security.*
+import org.http4k.security.InsecureCookieBasedOAuthPersistence
+import org.http4k.security.OAuthProvider
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
 
 
 private val oAuthPersistence = InsecureCookieBasedOAuthPersistence("http4k-oidc")
-
-fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
-
-class BasicAuthAccessTokenFetcherAuthenticator(private val providerConfig: OAuthProviderConfig) :
-    AccessTokenFetcherAuthenticator {
-    override fun authenticate(request: Request) =
-        request.header("Authorization", "Basic ${providerConfig.credentials.base64Encoded()}")
-}
-
-
-fun OAuthProvider.Companion.oidcAuthServer(
-    client: HttpHandler,
-    credentials: Credentials,
-    callbackUri: Uri,
-    oAuthPersistence: OAuthPersistence,
-    scopes: List<String> = listOf("openid")
-): OAuthProvider {
-    val providerConfig = OAuthProviderConfig(
-        Uri.of("https://www.certification.openid.net"),
-        "/test/a/http4k-oidc/authorize",
-        "/test/a/http4k-oidc/token",
-        credentials
-    )
-    return OAuthProvider(
-        providerConfig,
-        client,
-        callbackUri,
-        scopes,
-        oAuthPersistence,
-        { it.query("nonce", CrossSiteRequestForgeryToken.SECURE_CSRF().value) },
-        CrossSiteRequestForgeryToken.SECURE_CSRF,
-        accessTokenFetcherAuthenticator = BasicAuthAccessTokenFetcherAuthenticator(providerConfig)
-    )
-}
-
 
 fun app(oauthProvider: OAuthProvider, client: HttpHandler): HttpHandler = routes(
 

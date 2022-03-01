@@ -9,4 +9,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build
-        run: ./gradlew :test-coordinator:run
+        run: CONFORMANCE_API_TOKEN=${{secrets.CONFORMANCE_API_TOKEN}} ./gradlew :test-coordinator:run

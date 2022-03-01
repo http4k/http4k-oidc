@@ -1,0 +1,12 @@
+name: Run OpenID Conformance Tests
+
+on: workflow_dispatch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        run: ./gradlew :test-coordinator:run

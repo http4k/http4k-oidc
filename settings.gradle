@@ -1,3 +1,4 @@
 rootProject.name = 'http4k-oidc'
 
 include("relying-party")
+include("test-coordinator")

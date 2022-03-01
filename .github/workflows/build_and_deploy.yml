@@ -19,4 +19,5 @@ jobs:
           heroku_api_key: ${{secrets.HTTP4K_OIDC_HEROKU_API_KEY}}
           heroku_app_name: "http4k-oidc"
           heroku_email: "ivan@gourame.com"
+          appdir: relying-party
           healthcheck: "https://http4k-oidc.herokuapp.com/health"

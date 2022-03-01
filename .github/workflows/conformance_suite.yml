@@ -1,9 +1,10 @@
-name: Run OpenID Conformance Tests
+name: Run OpenID Tests
 
 on: workflow_dispatch
 
 jobs:
   test:
+    name: Run Conformance Suite
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

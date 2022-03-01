@@ -20,4 +20,5 @@ jobs:
           heroku_app_name: "http4k-oidc"
           heroku_email: "ivan@gourame.com"
           appdir: relying-party
+          branch: "main"
           healthcheck: "https://http4k-oidc.herokuapp.com/health"

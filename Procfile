@@ -1,1 +1,0 @@
-web: build/install/http4k-oidc/bin/http4k-oidc $PORT

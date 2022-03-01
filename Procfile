@@ -1,0 +1,1 @@
+web: relying-party/build/install/relying-party/bin/relying-party $PORT

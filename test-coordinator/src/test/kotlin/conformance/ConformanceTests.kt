@@ -20,8 +20,17 @@ class ConformanceTests {
 
     @TestFactory
     fun `execute test plan`(): List<DynamicTest> {
-        val testInfo = conformance.createTestFromPlan(PlanId.of("6aJ57GEWsAPJk"), TestName.of("oidcc-client-test"))
-        return listOf(DynamicTest.dynamicTest(testInfo.summary) { runTest(testInfo) })
+        val testsToRun = listOf(
+            TestName.of("oidcc-client-test"),
+//            TestName.of("oidcc-client-test-invalid-iss"),
+        )
+        val tests = conformance.fetchAvailableTests().filter { it.testName in testsToRun }
+        return tests.map { testDefinition ->
+            DynamicTest.dynamicTest(testDefinition.displayName.value) {
+                val testInfo = conformance.createTestFromPlan(PlanId.of("6aJ57GEWsAPJk"), testDefinition.testName)
+                runTest(testInfo)
+            }
+        }
     }
 
     private fun runTest(testInfo: TestInfo) {

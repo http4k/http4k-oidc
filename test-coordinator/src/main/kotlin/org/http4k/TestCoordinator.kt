@@ -29,6 +29,9 @@ class Conformance(apiToken: ApiToken) {
         .then(ClientFilters.BearerAuth(apiToken.value))
         .then(Filter { next -> { next(it.header("Content-Type", "application/json")) } }).then(JavaHttpClient())
 
+    fun fetchAvailableTests(): List<TestDefinition> =
+        availableTestsResponse(client(Request(GET, "/api/runner/available")))
+
     fun createTestFromPlan(planId: PlanId, testName: TestName) =
         testId(
             client(
@@ -57,6 +60,7 @@ class Conformance(apiToken: ApiToken) {
     companion object {
         val testId = Body.auto<TestCreationResponse>().map(TestCreationResponse::id).toLens()
         val testInfoResponse = Body.auto<TestInfoResponse>().toLens()
+        val availableTestsResponse = Body.auto<List<TestDefinition>>().toLens()
     }
 }
 
@@ -67,6 +71,9 @@ class PlanId private constructor(value: String) : StringValue(value) {
 class TestName private constructor(value: String) : StringValue(value) {
     companion object : ValueFactory<TestName, String>(::TestName, null, { it })
 }
+class DisplayName private constructor(value: String) : StringValue(value) {
+    companion object : ValueFactory<DisplayName, String>(::DisplayName, null, { it })
+}
 
 class ApiToken private constructor(value: String) : StringValue(value) {
     companion object : ValueFactory<ApiToken, String>(::ApiToken, null, { it })
@@ -75,6 +82,8 @@ class ApiToken private constructor(value: String) : StringValue(value) {
 class TestId private constructor(value: String) : StringValue(value) {
     companion object : ValueFactory<TestId, String>(::TestId, null, { it })
 }
+
+data class TestDefinition(val testName: TestName, val displayName: DisplayName)
 
 data class TestInfo(
     val testId: TestId,
@@ -111,6 +120,7 @@ fun <T> AutoMappingConfiguration<T>.withCustomMappings() = apply {
     value(PlanId)
     value(TestId)
     value(TestName)
+    value(DisplayName)
     text(BiDiMapping({ TestStatus.valueOf(it) }, TestStatus::name))
     text(BiDiMapping({ TestResult.valueOf(it) }, TestResult::name))
 }

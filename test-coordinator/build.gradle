@@ -32,6 +32,9 @@ targetCompatibility = JavaVersion.VERSION_11
 
 test {
     useJUnitPlatform()
+    filter {
+        exclude "conformance/**"
+    }
 }
 
 dependencies {
@@ -66,4 +69,14 @@ testlogger {
     showSkippedStandardStreams true
     showFailedStandardStreams true
     logLevel 'lifecycle'
+}
+
+task conformanceTests(type: Test) {
+    description = 'Runs OIDC Foundation Conformance tests.'
+    group = 'verification'
+    useJUnitPlatform()
+
+    filter {
+        include "conformance/**"
+    }
 }

@@ -1,7 +1,8 @@
-package org.http4k
+package conformance
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.*
 import org.http4k.TestResult.PASSED
 import org.http4k.TestStatus.FINISHED
 import org.http4k.cloudnative.env.Environment

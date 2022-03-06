@@ -6,9 +6,8 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.ValueFactory
 import org.http4k.ConformanceJackson.auto
+import org.http4k.TestStatus.WAITING
 import org.http4k.client.JavaHttpClient
-import org.http4k.cloudnative.env.Environment
-import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -17,19 +16,12 @@ import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.inIntelliJOnly
 import org.http4k.format.*
 import org.http4k.lens.BiDiMapping
-import org.http4k.lens.value
+import java.time.Duration
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.TimeUnit.SECONDS
 
-fun main() {
-    val environment = Environment.ENV
-    val apiToken = EnvironmentKey.value(ApiToken).required("CONFORMANCE_API_TOKEN")
-
-    val conformance = Conformance(apiToken(environment))
-
-    val id = conformance.createTestFromPlan(PlanId.of("6aJ57GEWsAPJk"), TestName.of("oidcc-client-test"))
-    println(conformance.getTestInfo(id))
-    ClientInteractions().performBasicOauth()
-    println(conformance.getTestInfo(id))
-}
 
 class Conformance(apiToken: ApiToken) {
     private val client = Filter.NoOp.then(ClientFilters.SetBaseUriFrom(Uri.of("https://www.certification.openid.net")))
@@ -38,9 +30,25 @@ class Conformance(apiToken: ApiToken) {
         .then(Filter { next -> { next(it.header("Content-Type", "application/json")) } }).then(JavaHttpClient())
 
     fun createTestFromPlan(planId: PlanId, testName: TestName) =
-        testId(client(Request(POST, "/api/runner").query("plan", planId.value).query("test", testName.value)))
+        testId(
+            client(
+                Request(POST, "/api/runner").query("plan", planId.value).query("test", testName.value)
+            )
+        ).also { waitForStatus(it, WAITING, Duration.ofSeconds(5)) }
 
     fun getTestInfo(testId: TestId) = testInfo(client(Request(GET, "/api/info/${testId.value}")))
+
+    private fun waitForStatus(testId: TestId, status: TestStatus, duration: Duration) {
+        val future = CompletableFuture<Unit>()
+        val executor = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
+            val currentStatus = getTestInfo(testId).status
+            if (currentStatus == status) {
+                future.complete(Unit)
+            }
+        }, 0, 1, SECONDS)
+        future.thenAccept { executor.cancel(false) }
+        future.get(duration.toMillis(), MILLISECONDS)
+    }
 
     companion object {
         val testId = Body.auto<TestCreationResponse>().map(TestCreationResponse::id).toLens()

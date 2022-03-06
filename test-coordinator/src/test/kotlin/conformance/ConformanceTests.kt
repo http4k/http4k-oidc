@@ -8,19 +8,23 @@ import org.http4k.TestStatus.FINISHED
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.lens.value
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.TestFactory
 
 class ConformanceTests {
 
-    @Test
-    fun `run core test`() {
-        val environment = Environment.ENV
-        val apiToken = EnvironmentKey.value(ApiToken).required("CONFORMANCE_API_TOKEN")
+    private val environment = Environment.ENV
+    private val apiToken = EnvironmentKey.value(ApiToken).required("CONFORMANCE_API_TOKEN")
 
-        val conformance = Conformance(apiToken(environment))
+    private val conformance = Conformance(apiToken(environment))
 
+    @TestFactory
+    fun `execute test plan`(): List<DynamicTest> {
         val testInfo = conformance.createTestFromPlan(PlanId.of("6aJ57GEWsAPJk"), TestName.of("oidcc-client-test"))
+        return listOf(DynamicTest.dynamicTest(testInfo.summary) { runTest(testInfo) })
+    }
 
+    private fun runTest(testInfo: TestInfo) {
         ClientInteractions().performBasicOauth()
 
         conformance.getTestInfo(testInfo.testId, testInfo.testName).assertPassed()

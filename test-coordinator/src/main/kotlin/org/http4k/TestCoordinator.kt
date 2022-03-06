@@ -60,15 +60,6 @@ class Conformance(apiToken: ApiToken) {
     }
 }
 
-class ClientInteractions {
-    private val client = Filter.NoOp.then(ClientFilters.FollowRedirects()).then(ClientFilters.Cookies())
-        .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly()).then(JavaHttpClient())
-
-    fun performBasicOauth() {
-        client(Request(GET, "https://http4k-oidc.herokuapp.com/oauth"))
-    }
-}
-
 class PlanId private constructor(value: String) : StringValue(value) {
     companion object : ValueFactory<PlanId, String>(::PlanId, null, { it })
 }

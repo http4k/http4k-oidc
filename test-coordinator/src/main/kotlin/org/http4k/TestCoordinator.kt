@@ -36,7 +36,7 @@ class Conformance(apiToken: ApiToken) {
             )
         ).also { waitForStatus(it, WAITING, Duration.ofSeconds(5)) }
 
-    fun getTestInfo(testId: TestId) = testInfo(client(Request(GET, "/api/info/${testId.value}")))
+    fun getTestInfo(testId: TestId) = testInfoResponse(client(Request(GET, "/api/info/${testId.value}")))
 
     private fun waitForStatus(testId: TestId, status: TestStatus, duration: Duration) {
         val future = CompletableFuture<Unit>()
@@ -52,7 +52,7 @@ class Conformance(apiToken: ApiToken) {
 
     companion object {
         val testId = Body.auto<TestCreationResponse>().map(TestCreationResponse::id).toLens()
-        val testInfo = Body.auto<TestInfo>().toLens()
+        val testInfoResponse = Body.auto<TestInfoResponse>().toLens()
     }
 }
 
@@ -91,7 +91,7 @@ enum class TestResult {
 
 data class TestCreationResponse(val id: TestId)
 
-data class TestInfo(val status: TestStatus, val result: TestResult?)
+data class TestInfoResponse(val status: TestStatus, val result: TestResult?)
 
 object ConformanceJackson : ConfigurableJackson(
     KotlinModule.Builder().build().asConfigurable().withStandardMappings().withCustomMappings().done()

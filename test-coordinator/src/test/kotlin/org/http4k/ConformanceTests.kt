@@ -24,7 +24,7 @@ class ConformanceTests {
     }
 }
 
-private fun TestInfo.assertPassed() {
-    assertThat(status, equalTo(TestStatus.FINISHED))
+private fun TestInfoResponse.assertPassed() {
+    assertThat(status, equalTo(TestStatus.WAITING))
     assertThat(result, equalTo(TestResult.PASSED))
 }

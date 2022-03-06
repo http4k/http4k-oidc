@@ -34,20 +34,24 @@ class Conformance(apiToken: ApiToken) {
             client(
                 Request(POST, "/api/runner").query("plan", planId.value).query("test", testName.value)
             )
-        ).also { waitForStatus(it, WAITING, Duration.ofSeconds(5)) }
+        ).let {
+            waitForStatus(it, testName, WAITING, Duration.ofSeconds(5))
+        }
 
-    fun getTestInfo(testId: TestId) = testInfoResponse(client(Request(GET, "/api/info/${testId.value}")))
+    fun getTestInfo(testId: TestId, testName: TestName) =
+        testInfoResponse(client(Request(GET, "/api/info/${testId.value}")))
+            .let { TestInfo(testId, testName, it.summary, it.status, it.result) }
 
-    private fun waitForStatus(testId: TestId, status: TestStatus, duration: Duration) {
-        val future = CompletableFuture<Unit>()
+    private fun waitForStatus(testId: TestId, testName: TestName, status: TestStatus, duration: Duration): TestInfo {
+        val future = CompletableFuture<TestInfo>()
         val executor = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
-            val currentStatus = getTestInfo(testId).status
-            if (currentStatus == status) {
-                future.complete(Unit)
+            val currentStatus = getTestInfo(testId, testName)
+            if (currentStatus.status == status) {
+                future.complete(currentStatus)
             }
         }, 0, 1, SECONDS)
         future.thenAccept { executor.cancel(false) }
-        future.get(duration.toMillis(), MILLISECONDS)
+        return future.get(duration.toMillis(), MILLISECONDS)
     }
 
     companion object {
@@ -81,6 +85,15 @@ class TestId private constructor(value: String) : StringValue(value) {
     companion object : ValueFactory<TestId, String>(::TestId, null, { it })
 }
 
+data class TestInfo(
+    val testId: TestId,
+    val testName: TestName,
+    val summary: String,
+    val status: TestStatus,
+    val result: TestResult?,
+    val logs: Uri = Uri.of("https://www.certification.openid.net/log-detail.html?log=${testId.value}")
+)
+
 enum class TestStatus {
     CREATED, WAITING, INTERRUPTED, FINISHED
 }
@@ -91,7 +104,7 @@ enum class TestResult {
 
 data class TestCreationResponse(val id: TestId)
 
-data class TestInfoResponse(val status: TestStatus, val result: TestResult?)
+data class TestInfoResponse(val summary: String, val status: TestStatus, val result: TestResult?)
 
 object ConformanceJackson : ConfigurableJackson(
     KotlinModule.Builder().build().asConfigurable().withStandardMappings().withCustomMappings().done()

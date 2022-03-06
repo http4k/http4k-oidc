@@ -2,6 +2,8 @@ package org.http4k
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.TestResult.PASSED
+import org.http4k.TestStatus.FINISHED
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.lens.value
@@ -16,15 +18,15 @@ class ConformanceTests {
 
         val conformance = Conformance(apiToken(environment))
 
-        val id = conformance.createTestFromPlan(PlanId.of("6aJ57GEWsAPJk"), TestName.of("oidcc-client-test"))
+        val testInfo = conformance.createTestFromPlan(PlanId.of("6aJ57GEWsAPJk"), TestName.of("oidcc-client-test"))
 
         ClientInteractions().performBasicOauth()
 
-        conformance.getTestInfo(id).assertPassed()
+        conformance.getTestInfo(testInfo.testId, testInfo.testName).assertPassed()
     }
 }
 
-private fun TestInfoResponse.assertPassed() {
-    assertThat(status, equalTo(TestStatus.WAITING))
-    assertThat(result, equalTo(TestResult.PASSED))
+private fun TestInfo.assertPassed() {
+    assertThat("Unexpected test status. Full logs: $logs\n", status, equalTo(FINISHED))
+    assertThat("Unexpected test result. Full logs: $logs\n", result, equalTo(PASSED))
 }

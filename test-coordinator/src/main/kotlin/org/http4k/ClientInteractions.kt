@@ -6,11 +6,11 @@ import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.inIntelliJOnly
 
-class ClientInteractions {
+class ClientInteractions(val baseUri: Uri) {
     private val client = Filter.NoOp.then(ClientFilters.FollowRedirects()).then(ClientFilters.Cookies())
         .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly()).then(JavaHttpClient())
 
     fun performBasicOauth() {
-        client(Request(Method.GET, "https://http4k-oidc.herokuapp.com/oauth"))
+        client(Request(Method.GET, baseUri.extend(Uri.of("/oauth"))))
     }
 }

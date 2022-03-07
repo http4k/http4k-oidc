@@ -16,7 +16,6 @@ import org.http4k.filter.inIntelliJOnly
 import org.http4k.lens.port
 import org.http4k.lens.secret
 import org.http4k.lens.uri
-import org.http4k.security.InsecureCookieBasedOAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
@@ -36,7 +35,7 @@ fun main() {
 
     val client = stack.then(JavaHttpClient())
 
-    val oAuthPersistence = InsecureCookieBasedOAuthPersistence("http4k-oidc")
+    val oAuthPersistence = SlightlyMoreSecureCookieBasedOauthPersistence()
 
     val oauthProvider = OAuthProvider.oidcAuthServer(
         client,

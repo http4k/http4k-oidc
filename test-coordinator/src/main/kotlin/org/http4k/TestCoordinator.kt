@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeoutException
 
 
 class Conformance(apiToken: ApiToken) {
@@ -45,7 +46,13 @@ class Conformance(apiToken: ApiToken) {
         testInfoResponse(client(Request(GET, "/api/info/${testId.value}")))
             .let { TestInfo(testId, testName, it.summary, it.status, it.result) }
 
-    private fun waitForStatus(testId: TestId, testName: TestName, status: TestStatus, duration: Duration): TestInfo {
+    fun waitForStatus(
+        testId: TestId,
+        testName: TestName,
+        status: TestStatus,
+        duration: Duration,
+        onTimeout: (e: TimeoutException) -> Nothing = { throw(it) }
+    ): TestInfo {
         val future = CompletableFuture<TestInfo>()
         val executor = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
             val currentStatus = getTestInfo(testId, testName)
@@ -54,7 +61,11 @@ class Conformance(apiToken: ApiToken) {
             }
         }, 0, 1, SECONDS)
         future.thenAccept { executor.cancel(false) }
-        return future.get(duration.toMillis(), MILLISECONDS)
+        try {
+            return future.get(duration.toMillis(), MILLISECONDS)
+        } catch (e: TimeoutException) {
+            onTimeout(e)
+        }
     }
 
     companion object {
@@ -71,6 +82,7 @@ class PlanId private constructor(value: String) : StringValue(value) {
 class TestName private constructor(value: String) : StringValue(value) {
     companion object : ValueFactory<TestName, String>(::TestName, null, { it })
 }
+
 class DisplayName private constructor(value: String) : StringValue(value) {
     companion object : ValueFactory<DisplayName, String>(::DisplayName, null, { it })
 }

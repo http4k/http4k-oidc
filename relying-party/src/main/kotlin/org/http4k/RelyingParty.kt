@@ -5,12 +5,12 @@ import org.http4k.core.Method.GET
 import org.http4k.filter.ClientFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.security.InsecureCookieBasedOAuthPersistence
+import org.http4k.security.OAuthPersistence
 import org.http4k.security.OAuthProvider
 
 fun RelyingParty(
     oauthProvider: OAuthProvider,
-    oAuthPersistence: InsecureCookieBasedOAuthPersistence,
+    oAuthPersistence: OAuthPersistence,
     client: HttpHandler
 ) = routes(
     "/health" bind GET to { Response(Status.OK) },

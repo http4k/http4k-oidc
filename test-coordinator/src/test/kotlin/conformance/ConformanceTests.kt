@@ -11,6 +11,8 @@ import org.http4k.lens.uri
 import org.http4k.lens.value
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
+import org.junit.jupiter.api.fail
+import java.time.Duration
 
 class ConformanceTests {
 
@@ -27,7 +29,7 @@ class ConformanceTests {
     fun `execute test plan`(): List<DynamicTest> {
         val testsToRun = listOf(
             TestName.of("oidcc-client-test"),
-//            TestName.of("oidcc-client-test-invalid-iss"),
+            TestName.of("oidcc-client-test-invalid-iss"),
         )
         val tests = conformance.fetchAvailableTests().filter { it.testName in testsToRun }
         return tests.map { testDefinition ->
@@ -40,6 +42,10 @@ class ConformanceTests {
 
     private fun runTest(testInfo: TestInfo) {
         ClientInteractions(baseUri).performBasicOauth()
+
+        conformance.waitForStatus(testInfo.testId, testInfo.testName, FINISHED, Duration.ofSeconds(7)) {
+            fail("Timed out waiting for test to finish.  Full logs: ${testInfo.logs}\n")
+        }
 
         conformance.getTestInfo(testInfo.testId, testInfo.testName).assertPassed()
     }

@@ -45,9 +45,7 @@ class ConformanceTests {
 
         conformance.waitForStatus(testInfo.testId, testInfo.testName, FINISHED, Duration.ofSeconds(7)) {
             fail("Timed out waiting for test to finish.  Full logs: ${testInfo.logs}\n")
-        }
-
-        conformance.getTestInfo(testInfo.testId, testInfo.testName).assertPassed()
+        }.assertPassed()
     }
 }
 

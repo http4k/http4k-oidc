@@ -1,6 +1,8 @@
 package org.http4k
 
+import com.nimbusds.jose.JOSEObject
 import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.PlainObject
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.jwk.source.RemoteJWKSet
 import com.nimbusds.jose.proc.BadJOSEException
@@ -8,6 +10,7 @@ import com.nimbusds.jose.proc.JWSKeySelector
 import com.nimbusds.jose.proc.JWSVerificationKeySelector
 import com.nimbusds.jose.proc.SecurityContext
 import com.nimbusds.jwt.JWTClaimsSet
+import com.nimbusds.jwt.PlainJWT
 import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier
 import com.nimbusds.jwt.proc.DefaultJWTProcessor
 import org.http4k.core.Request
@@ -48,6 +51,13 @@ class SlightlyMoreSecureCookieBasedOauthPersistence(
             setOf("sub", "iat"),
             setOf()
         )
+
+        val parse: JOSEObject = JOSEObject.parse(idToken.value)
+
+        if(parse is PlainJWT || parse is PlainObject){
+            // if the id_token is unsigned, the relying party should proceed and make a /userinfo request
+            return delegate.assignToken(request, redirect, accessToken, idToken)
+        }
 
         val jwtProcessor = DefaultJWTProcessor<SecurityContext>().apply {
             jwtClaimsSetVerifier = claimsVerifier

@@ -36,7 +36,7 @@ class ConformanceTests {
             TestName.of("oidcc-client-test-kid-absent-single-jwks"),
             TestName.of("oidcc-client-test-kid-absent-multiple-jwks"),
             TestName.of("oidcc-client-test-idtoken-sig-rs256"),
-//            TestName.of("oidcc-client-test-idtoken-sig-none"),
+            TestName.of("oidcc-client-test-idtoken-sig-none"),
             TestName.of("oidcc-client-test-invalid-sig-rs256"),
             TestName.of("oidcc-client-test-userinfo-invalid-sub"),
             TestName.of("oidcc-client-test-nonce-invalid"),

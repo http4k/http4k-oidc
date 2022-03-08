@@ -1,14 +1,23 @@
 package org.http4k
 
-import org.http4k.core.Body
+import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.jwk.source.JWKSource
+import com.nimbusds.jose.jwk.source.RemoteJWKSet
+import com.nimbusds.jose.proc.BadJOSEException
+import com.nimbusds.jose.proc.JWSKeySelector
+import com.nimbusds.jose.proc.JWSVerificationKeySelector
+import com.nimbusds.jose.proc.SecurityContext
+import com.nimbusds.jwt.JWTClaimsSet
+import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier
+import com.nimbusds.jwt.proc.DefaultJWTProcessor
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
-import org.http4k.format.Jackson.auto
 import org.http4k.security.AccessToken
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
 import org.http4k.security.OAuthPersistence
 import org.http4k.security.openid.IdToken
+import java.net.URL
+
 
 class SlightlyMoreSecureCookieBasedOauthPersistence(
     private val delegate: OAuthPersistence = InsecureCookieBasedOAuthPersistence(
@@ -25,16 +34,29 @@ class SlightlyMoreSecureCookieBasedOauthPersistence(
 
         //performing validations as described in spec: https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.3.1.3.7
 
-        val jwt = Jwt.lens(Response(Status.OK).body(idToken.value.split(".")[1].base64Decoded()))
-        return if (jwt.iss != "https://www.certification.openid.net/test/a/http4k-oidc/")
-            delegate.authFailureResponse()
-        else
-            delegate.assignToken(request, redirect, accessToken, idToken)
-    }
-}
+        val keySource: JWKSource<SecurityContext> =
+            RemoteJWKSet(URL("https://www.certification.openid.net/test/a/http4k-oidc/jwks"))
+        val expectedJWSAlg = JWSAlgorithm.RS256
 
-class Jwt(val iss: String) {
-    companion object {
-        val lens = Body.auto<Jwt>().toLens()
+        val keySelector: JWSKeySelector<SecurityContext> =
+            JWSVerificationKeySelector(expectedJWSAlg, keySource)
+
+        val claimsVerifier = DefaultJWTClaimsVerifier<SecurityContext>(
+            null,
+            JWTClaimsSet.Builder().issuer("https://www.certification.openid.net/test/a/http4k-oidc/").build(),
+            setOf(),
+            setOf()
+        )
+
+        val jwtProcessor = DefaultJWTProcessor<SecurityContext>().apply {
+            jwtClaimsSetVerifier = claimsVerifier
+            setJWSKeySelector(keySelector)
+        }
+        return try {
+            jwtProcessor.process(idToken.value, null)
+            delegate.assignToken(request, redirect, accessToken, idToken)
+        } catch (e: BadJOSEException) {
+            delegate.authFailureResponse().body(e.message.orEmpty())
+        }
     }
 }

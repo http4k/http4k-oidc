@@ -30,6 +30,9 @@ class ConformanceTests {
         val testsToRun = listOf(
             TestName.of("oidcc-client-test"),
             TestName.of("oidcc-client-test-invalid-iss"),
+            TestName.of("oidcc-client-test-missing-sub"),
+            TestName.of("oidcc-client-test-invalid-aud"),
+            TestName.of("oidcc-client-test-missing-iat")
         )
         val tests = conformance.fetchAvailableTests().filter { it.testName in testsToRun }
         return tests.map { testDefinition ->

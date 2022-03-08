@@ -42,9 +42,9 @@ class SlightlyMoreSecureCookieBasedOauthPersistence(
             JWSVerificationKeySelector(expectedJWSAlg, keySource)
 
         val claimsVerifier = DefaultJWTClaimsVerifier<SecurityContext>(
-            null,
+            setOf("http4k-oidc"),
             JWTClaimsSet.Builder().issuer("https://www.certification.openid.net/test/a/http4k-oidc/").build(),
-            setOf(),
+            setOf("sub", "iat"),
             setOf()
         )
 

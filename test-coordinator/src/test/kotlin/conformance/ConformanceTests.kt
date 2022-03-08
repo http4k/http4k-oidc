@@ -32,8 +32,18 @@ class ConformanceTests {
             TestName.of("oidcc-client-test-invalid-iss"),
             TestName.of("oidcc-client-test-missing-sub"),
             TestName.of("oidcc-client-test-invalid-aud"),
-            TestName.of("oidcc-client-test-missing-iat")
+            TestName.of("oidcc-client-test-missing-iat"),
+            TestName.of("oidcc-client-test-kid-absent-single-jwks"),
+            TestName.of("oidcc-client-test-kid-absent-multiple-jwks"),
+            TestName.of("oidcc-client-test-idtoken-sig-rs256"),
+//            TestName.of("oidcc-client-test-idtoken-sig-none"),
+            TestName.of("oidcc-client-test-invalid-sig-rs256"),
+            TestName.of("oidcc-client-test-userinfo-invalid-sub"),
+            TestName.of("oidcc-client-test-nonce-invalid"),
+            TestName.of("oidcc-client-test-scope-userinfo-claims"),
+            TestName.of("oidcc-client-test-client-secret-basic"),
         )
+
         val tests = conformance.fetchAvailableTests().filter { it.testName in testsToRun }
         return tests.map { testDefinition ->
             DynamicTest.dynamicTest(testDefinition.displayName.value) {

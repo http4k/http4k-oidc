@@ -1,6 +1,9 @@
 package org.http4k
 
-import org.http4k.core.*
+import org.http4k.core.Credentials
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.security.*
 
 fun OAuthProvider.Companion.oidcAuthServer(
@@ -8,7 +11,7 @@ fun OAuthProvider.Companion.oidcAuthServer(
     credentials: Credentials,
     callbackUri: Uri,
     oAuthPersistence: OAuthPersistence,
-    scopes: List<String> = listOf("openid")
+    scopes: List<String> = listOf("profile", "email", "phone", "address", "openid")
 ): OAuthProvider {
     val providerConfig = OAuthProviderConfig(
         Uri.of("https://www.certification.openid.net"),
@@ -22,9 +25,9 @@ fun OAuthProvider.Companion.oidcAuthServer(
         callbackUri,
         scopes,
         oAuthPersistence,
-        { it.query("nonce", CrossSiteRequestForgeryToken.SECURE_CSRF().value) },
+        { it },
         CrossSiteRequestForgeryToken.SECURE_CSRF,
-        accessTokenFetcherAuthenticator = BasicAuthAccessTokenFetcherAuthenticator(providerConfig)
+        accessTokenFetcherAuthenticator = BasicAuthAccessTokenFetcherAuthenticator(providerConfig),
     )
 }
 

@@ -14,6 +14,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.security.AccessToken
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
+import org.http4k.security.Nonce
 import org.http4k.security.OAuthPersistence
 import org.http4k.security.openid.IdToken
 import java.net.URL
@@ -53,8 +54,20 @@ class SlightlyMoreSecureCookieBasedOauthPersistence(
             setJWSKeySelector(keySelector)
         }
         return try {
-            jwtProcessor.process(idToken.value, null)
-            delegate.assignToken(request, redirect, accessToken, idToken)
+            val jwt = jwtProcessor.process(idToken.value, null)
+
+            val nonceSent = retrieveNonce(request)
+            val nonceReceived = jwt.getClaim("nonce")?.let { Nonce(it.toString()) }
+
+            println("sent nonce=${nonceSent?.value}")
+            println("sent backs=${nonceReceived?.value}")
+
+            if (nonceReceived != nonceSent) {
+                delegate.authFailureResponse().body("invalid nonce")
+            }else{
+                delegate.assignToken(request, redirect, accessToken, idToken)
+            }
+
         } catch (e: BadJOSEException) {
             delegate.authFailureResponse().body(e.message.orEmpty())
         }

@@ -16,6 +16,7 @@ import org.http4k.filter.inIntelliJOnly
 import org.http4k.lens.port
 import org.http4k.lens.secret
 import org.http4k.lens.uri
+import org.http4k.routing.routes
 import org.http4k.security.OAuthProvider
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
@@ -44,7 +45,13 @@ fun main() {
         oAuthPersistence
     )
 
-    val printingApp = stack.then(RelyingParty(oauthProvider, oAuthPersistence, client))
+    val allAps = routes(
+        RelyingParty(oauthProvider, oAuthPersistence, client),
+        AuthorisationServer(),
+        Health()
+    )
+
+    val printingApp = stack.then(allAps)
     val server = printingApp.asServer(Undertow(port(environment).value)).start()
 
     println("Server started on " + server.port())

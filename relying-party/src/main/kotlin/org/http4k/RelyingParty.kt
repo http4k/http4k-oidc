@@ -13,7 +13,6 @@ fun RelyingParty(
     oAuthPersistence: OAuthPersistence,
     client: HttpHandler
 ) = routes(
-    "/health" bind GET to { Response(Status.OK) },
     "/oauth" bind routes(
         "/" bind GET to oauthProvider.authFilter.then {
             val token = oAuthPersistence.retrieveToken(it)?.value ?: error("not authenticated")

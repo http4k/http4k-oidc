@@ -45,6 +45,7 @@ class ConformanceTests {
         )
 
         val tests = conformance.fetchAvailableTests().filter { it.testName in testsToRun }
+
         return tests.map { testDefinition ->
             DynamicTest.dynamicTest(testDefinition.displayName.value) {
                 val testInfo = conformance.createTestFromPlan(planId, testDefinition.testName)

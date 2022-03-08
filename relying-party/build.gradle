@@ -41,6 +41,8 @@ dependencies {
     implementation "org.http4k:http4k-server-undertow:${http4kVersion}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
     implementation "dev.forkhandles:values4k:2.0.0.0"
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.20'
     testImplementation "org.http4k:http4k-testing-hamkrest:${http4kVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"

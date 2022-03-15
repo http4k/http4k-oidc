@@ -7,15 +7,6 @@ repositories {
     mavenCentral()
 }
 
-apply plugin: 'kotlin'
-
-compileKotlin.kotlinOptions.jvmTarget = "11"
-compileTestKotlin.kotlinOptions.jvmTarget = "11"
-compileTestKotlin.kotlinOptions.freeCompilerArgs += "-Xjvm-default=enable"
-
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
-
 test {
     useJUnitPlatform()
 }

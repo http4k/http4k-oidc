@@ -3,14 +3,6 @@ apply plugin: 'application'
 
 mainClassName = "org.http4k.ServerKt"
 
-repositories {
-    mavenCentral()
-}
-
-test {
-    useJUnitPlatform()
-}
-
 dependencies {
     implementation "org.http4k:http4k-client-okhttp:${http4kVersion}"
     implementation "org.http4k:http4k-core:${http4kVersion}"

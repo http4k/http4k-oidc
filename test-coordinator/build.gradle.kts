@@ -4,19 +4,20 @@ import com.adarshr.gradle.testlogger.theme.ThemeType
 apply(plugin = "com.adarshr.test-logger")
 
 dependencies {
-    implementation("org.http4k:http4k-client-okhttp:4.19.0.0")
-    implementation("org.http4k:http4k-core:4.19.0.0")
-    implementation("org.http4k:http4k-format-jackson:4.19.0.0")
-    implementation("org.http4k:http4k-cloudnative:4.19.0.0")
-    implementation("org.http4k:http4k-security-oauth:4.19.0.0")
-    implementation("org.http4k:http4k-server-undertow:4.19.0.0")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10")
-    implementation("dev.forkhandles:values4k:2.0.0.0")
-    implementation("io.jsonwebtoken:jjwt-api:0.11.2")
-    implementation("com.nimbusds:nimbus-jose-jwt:9.20")
-    testImplementation("org.http4k:http4k-testing-hamkrest:4.19.0.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
+    api(platform(Http4k.bom))
+    implementation(Http4k.client.okhttp)
+    implementation(Http4k.core)
+    implementation(Http4k.format.jackson)
+    implementation(Http4k.cloudnative)
+    implementation(Http4k.securityOauth)
+    implementation(Http4k.server.undertow)
+    implementation(Kotlin.stdlib.jdk8)
+    implementation("dev.forkhandles:values4k:_")
+    implementation("io.jsonwebtoken:jjwt-api:_")
+    implementation("com.nimbusds:nimbus-jose-jwt:_")
+    testImplementation(Http4k.testing.hamkrest)
+    testImplementation(Testing.junit.jupiter.api)
+    testImplementation(Testing.junit.jupiter.engine)
 }
 
 tasks.test {

@@ -7,8 +7,8 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
-        classpath("com.adarshr:gradle-test-logger-plugin:3.2.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
+        classpath("com.adarshr:gradle-test-logger-plugin:_")
     }
 }
 
@@ -30,4 +30,6 @@ subprojects {
             useJUnitPlatform()
         }
     }
+
+
 }

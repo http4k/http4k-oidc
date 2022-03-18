@@ -27,6 +27,7 @@ fun OAuthProvider.Companion.oidcAuthServer(
         { it },
         CrossSiteRequestForgeryToken.SECURE_CSRF,
         accessTokenFetcherAuthenticator = BasicAuthAccessTokenFetcherAuthenticator(providerConfig),
+        idTokenConsumer = IdTokenConsumerWithValidations()
     )
 }
 

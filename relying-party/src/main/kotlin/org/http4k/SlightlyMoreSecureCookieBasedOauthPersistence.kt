@@ -9,9 +9,7 @@ import com.nimbusds.jose.proc.BadJOSEException
 import com.nimbusds.jose.proc.JWSKeySelector
 import com.nimbusds.jose.proc.JWSVerificationKeySelector
 import com.nimbusds.jose.proc.SecurityContext
-import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.PlainJWT
-import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier
 import com.nimbusds.jwt.proc.DefaultJWTProcessor
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -42,12 +40,6 @@ class SlightlyMoreSecureCookieBasedOauthPersistence(
         val keySelector: JWSKeySelector<SecurityContext> =
             JWSVerificationKeySelector(expectedJWSAlg, keySource)
 
-        val claimsVerifier = DefaultJWTClaimsVerifier<SecurityContext>(
-            setOf("http4k-oidc"),
-            JWTClaimsSet.Builder().issuer("https://www.certification.openid.net/test/a/http4k-oidc/").build(),
-            setOf("sub", "iat"),
-            setOf()
-        )
 
         val parse: JOSEObject = JOSEObject.parse(idToken.value)
 
@@ -57,7 +49,6 @@ class SlightlyMoreSecureCookieBasedOauthPersistence(
         }
 
         val jwtProcessor = DefaultJWTProcessor<SecurityContext>().apply {
-            jwtClaimsSetVerifier = claimsVerifier
             setJWSKeySelector(keySelector)
         }
         return try {

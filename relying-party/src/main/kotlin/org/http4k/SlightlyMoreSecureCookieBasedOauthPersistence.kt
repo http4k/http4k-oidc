@@ -15,10 +15,7 @@ import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier
 import com.nimbusds.jwt.proc.DefaultJWTProcessor
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.security.AccessToken
-import org.http4k.security.InsecureCookieBasedOAuthPersistence
-import org.http4k.security.Nonce
-import org.http4k.security.OAuthPersistence
+import org.http4k.security.*
 import org.http4k.security.openid.IdToken
 import java.net.URL
 
@@ -73,13 +70,13 @@ class SlightlyMoreSecureCookieBasedOauthPersistence(
             println("sent backs=${nonceReceived?.value}")
 
             if (nonceReceived != nonceSent) {
-                delegate.authFailureResponse().body("invalid nonce")
+                delegate.authFailureResponse(OauthCallbackError.InvalidNonce(nonceSent?.value, nonceReceived?.value)).body("invalid nonce")
             }else{
                 delegate.assignToken(request, redirect, accessToken, idToken)
             }
 
         } catch (e: BadJOSEException) {
-            delegate.authFailureResponse().body(e.message.orEmpty())
+            delegate.authFailureResponse(OauthCallbackError.InvalidIdToken(e.message.orEmpty())).body(e.message.orEmpty())
         }
     }
 }

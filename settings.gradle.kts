@@ -4,5 +4,6 @@ plugins {
 
 rootProject.name = "http4k-oidc"
 
+include("oidc")
 include("relying-party")
 include("test-coordinator")

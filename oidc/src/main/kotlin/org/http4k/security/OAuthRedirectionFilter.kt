@@ -40,7 +40,7 @@ class OAuthRedirectionFilter(
             )
 
             val redirect = Response(TEMPORARY_REDIRECT)
-                .with(LOCATION of modifyState(redirectionBuilder(providerConfig.authUri, authRequest, state, nonce)))
+                .with(LOCATION of modifyState(redirectionBuilder(providerConfig.authUri, authRequest)))
             assignNonceIfRequired(
                 oAuthPersistence.assignOriginalUri(
                     oAuthPersistence.assignCsrf(redirect, csrf),

@@ -61,13 +61,13 @@ class SlightlyMoreSecureCookieBasedOauthPersistence(
             println("sent backs=${nonceReceived?.value}")
 
             if (nonceReceived != nonceSent) {
-                delegate.authFailureResponse(OauthCallbackError.InvalidNonce(nonceSent?.value, nonceReceived?.value)).body("invalid nonce")
+                delegate.authFailureResponse(OAuthCallbackError.InvalidNonce(nonceSent?.value, nonceReceived?.value)).body("invalid nonce")
             }else{
                 delegate.assignToken(request, redirect, accessToken, idToken)
             }
 
         } catch (e: BadJOSEException) {
-            delegate.authFailureResponse(OauthCallbackError.InvalidIdToken(e.message.orEmpty())).body(e.message.orEmpty())
+            delegate.authFailureResponse(OAuthCallbackError.InvalidIdToken(e.message.orEmpty())).body(e.message.orEmpty())
         }
     }
 }

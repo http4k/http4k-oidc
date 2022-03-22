@@ -17,7 +17,7 @@ import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import org.http4k.security.Nonce
-import org.http4k.security.OauthCallbackError.InvalidIdToken
+import org.http4k.security.OAuthCallbackError.InvalidIdToken
 import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
 import java.net.URL

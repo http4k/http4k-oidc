@@ -8,7 +8,8 @@ on:
     - cron: '0 7 * * *'
 
 jobs:
-  "Refresh-Versions":
+  refresh-versions:
+    name: Check New Versions
     runs-on: "ubuntu-latest"
     steps:
       - id: step-0

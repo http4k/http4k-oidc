@@ -6,7 +6,7 @@ import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.inIntelliJOnly
 
-class ClientInteractions(val baseUri: Uri) {
+class ClientInteractions(private val baseUri: Uri) {
     private val client = Filter.NoOp.then(ClientFilters.FollowRedirects()).then(ClientFilters.Cookies())
         .then(DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly()).then(JavaHttpClient())
 

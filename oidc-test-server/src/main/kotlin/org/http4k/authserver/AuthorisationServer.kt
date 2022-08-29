@@ -16,9 +16,11 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.AccessToken
+import org.http4k.security.Nonce
 import org.http4k.security.oauth.server.*
 import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
+import org.http4k.security.openid.IdToken
 import java.time.Clock
 import java.time.temporal.ChronoUnit.DAYS
 import java.util.*
@@ -31,6 +33,7 @@ fun AuthorisationServer(): RoutingHttpHandler {
         accessTokenRequestAuthentication = BasicAuthAccessTokenRequestAuthentication(),
         authorizationCodes = InsecureAuthorizationCodes(),
         accessTokens = InsecureAccessTokens(),
+        idTokens = TestIdTokens(),
         clock = Clock.systemUTC(),
     )
 
@@ -51,6 +54,23 @@ fun AuthorisationServer(): RoutingHttpHandler {
             "/" bind { _: Request -> Response(OK).body("Authorisation server") }
         )
     )
+}
+
+class TestIdTokens : IdTokens {
+    override fun createForAccessToken(
+        authorizationCodeDetails: AuthorizationCodeDetails,
+        code: AuthorizationCode,
+        accessToken: AccessToken
+    ): IdToken = IdToken(idToken)
+
+    override fun createForAuthorization(
+        request: Request,
+        authRequest: AuthRequest,
+        response: Response,
+        nonce: Nonce?,
+        code: AuthorizationCode
+    ): IdToken = IdToken(idToken)
+
 }
 
 class InsecureClientValidator : ClientValidator {

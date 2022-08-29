@@ -1,9 +1,6 @@
 name: Build & Deploy
 
-on:
-  push:
-    branches:
-      - main
+on: push
 
 jobs:
   build:
@@ -15,6 +12,7 @@ jobs:
       - name: Build
         run: ./gradlew check
       - name: Deploy
+        if: github.ref == 'refs/heads/main'
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HTTP4K_OIDC_HEROKU_API_KEY}}

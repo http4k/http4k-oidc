@@ -47,12 +47,23 @@ configure<TestLoggerExtension> {
 }
 
 tasks.register<Test>("conformanceTestsRelyingParty") {
-    description = "Runs OIDC Foundation Conformance tests."
+    description = "Runs OIDC Foundation Conformance tests (Relying Party)."
     group = "verification"
 
     useJUnitPlatform()
 
     filter {
         include("conformance/relyingparty/core/**")
+    }
+}
+
+tasks.register<Test>("conformanceTestsAuthServer") {
+    description = "Runs OIDC Foundation Conformance tests (Auth Server)."
+    group = "verification"
+
+    useJUnitPlatform()
+
+    filter {
+        include("conformance/authserver/core/**")
     }
 }

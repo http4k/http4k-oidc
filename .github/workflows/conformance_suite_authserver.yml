@@ -1,0 +1,17 @@
+name: Run OpenID Tests (Relying Party)
+
+on: workflow_dispatch
+
+jobs:
+  test:
+    name: Run Conformance Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        env:
+          CONFORMANCE_API_TOKEN: ${{secrets.CONFORMANCE_API_TOKEN}}
+          CONFORMANCE_PLAN_ID: xZWHxwecfbFY9
+          CONFORMANCE_RELYING_PARTY_BASE_URI: https://http4k-oidc.herokuapp.com
+        run: ./gradlew :test-coordinator:conformanceTestsAuthServer

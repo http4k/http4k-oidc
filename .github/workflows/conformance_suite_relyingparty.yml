@@ -1,4 +1,4 @@
-name: Run OpenID Tests (Relying Party)
+name: OpenID Tests (Relying Party)
 
 on: workflow_dispatch
 

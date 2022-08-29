@@ -3,6 +3,7 @@ package org.http4k
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
+import org.http4k.relyingparty.IdTokenConsumerWithValidations
 import org.http4k.security.*
 
 fun OAuthProvider.Companion.oidcAuthServer(

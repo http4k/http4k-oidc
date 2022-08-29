@@ -1,4 +1,4 @@
-package org.http4k
+package org.http4k.relyingparty
 
 import org.http4k.core.*
 import org.http4k.core.Method.GET

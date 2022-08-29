@@ -1,4 +1,4 @@
-package org.http4k
+package org.http4k.relyingparty
 
 import com.nimbusds.jose.JOSEObject
 import com.nimbusds.jose.JWSAlgorithm

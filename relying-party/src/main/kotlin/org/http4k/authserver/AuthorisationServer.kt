@@ -1,4 +1,4 @@
-package org.http4k
+package org.http4k.authserver
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success

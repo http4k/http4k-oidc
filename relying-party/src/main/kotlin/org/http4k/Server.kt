@@ -3,6 +3,7 @@ package org.http4k
 import org.http4k.Config.baseUri
 import org.http4k.Config.oauthCredentials
 import org.http4k.Config.port
+import org.http4k.authserver.AuthorisationServer
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
@@ -16,6 +17,8 @@ import org.http4k.filter.inIntelliJOnly
 import org.http4k.lens.port
 import org.http4k.lens.secret
 import org.http4k.lens.uri
+import org.http4k.relyingparty.RelyingParty
+import org.http4k.relyingparty.SlightlyMoreSecureCookieBasedOauthPersistence
 import org.http4k.routing.routes
 import org.http4k.security.OAuthProvider
 import org.http4k.server.Undertow

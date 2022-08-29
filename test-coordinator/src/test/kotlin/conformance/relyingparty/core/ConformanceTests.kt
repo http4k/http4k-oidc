@@ -1,10 +1,7 @@
-package conformance
+package conformance.relyingparty.core
 
-import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
+import conformance.assertPassed
 import org.http4k.*
-import org.http4k.TestResult.PASSED
-import org.http4k.TestStatus.FINISHED
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.lens.uri
@@ -57,13 +54,8 @@ class ConformanceTests {
     private fun runTest(testInfo: TestInfo) {
         ClientInteractions(baseUri).performBasicOauth()
 
-        conformance.waitForStatus(testInfo.testId, testInfo.testName, FINISHED, Duration.ofSeconds(7)) {
+        conformance.waitForStatus(testInfo.testId, testInfo.testName, TestStatus.FINISHED, Duration.ofSeconds(7)) {
             fail("Timed out waiting for test to finish. Full logs: ${testInfo.logs}\n")
         }.assertPassed()
     }
-}
-
-private fun TestInfo.assertPassed() {
-    assertThat("Unexpected test status. Full logs: $logs\n", status, equalTo(FINISHED))
-    assertThat("Unexpected test result. Full logs: $logs\n", result, equalTo(PASSED))
 }

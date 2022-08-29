@@ -53,6 +53,6 @@ tasks.register<Test>("conformanceTests") {
     useJUnitPlatform()
 
     filter {
-        include("conformance/**")
+        include("conformance/relyingparty/core/**")
     }
 }

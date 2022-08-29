@@ -45,7 +45,7 @@ fun AuthorisationServer(): RoutingHttpHandler {
             "/userinfo" bind GET to { _: Request -> Response(OK).body("{}") },
             "/authorize" bind GET to server.authenticationStart.then {
                 Response(OK)
-                    .body("""<html><form method="POST"><button type="submit">Please authenticate</button></form></html>""")
+                    .body("""<html><form method="POST"><button type="submit" name="login">Please authenticate</button></form></html>""")
             },
             "/authorize" bind POST to server.authenticationComplete,
             "/" bind { _: Request -> Response(OK).body("Authorisation server") }

@@ -46,7 +46,7 @@ configure<TestLoggerExtension> {
     logLevel =  LogLevel.LIFECYCLE
 }
 
-tasks.register<Test>("conformanceTests") {
+tasks.register<Test>("conformanceTestsRelyingParty") {
     description = "Runs OIDC Foundation Conformance tests."
     group = "verification"
 

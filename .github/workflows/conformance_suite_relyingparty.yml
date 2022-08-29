@@ -1,4 +1,4 @@
-name: Run OpenID Tests
+name: Run OpenID Tests (Relying Party)
 
 on: workflow_dispatch
 
@@ -14,4 +14,4 @@ jobs:
           CONFORMANCE_API_TOKEN: ${{secrets.CONFORMANCE_API_TOKEN}}
           CONFORMANCE_PLAN_ID: 6aJ57GEWsAPJk
           CONFORMANCE_RELYING_PARTY_BASE_URI: https://http4k-oidc.herokuapp.com
-        run: ./gradlew :test-coordinator:conformanceTests
+        run: ./gradlew :test-coordinator:conformanceTestsRelyingParty

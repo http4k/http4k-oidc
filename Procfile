@@ -1,1 +1,1 @@
-web: oidc-test-server/build/install/relying-party/bin/relying-party $PORT
+web: oidc-test-server/build/install/oidc-test-server/bin/oidc-test-server $PORT

@@ -2,14 +2,13 @@ package org.http4k.authserver
 
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
-import org.http4k.core.then
 import org.http4k.format.Jackson
+import org.http4k.lens.Header
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -34,7 +33,11 @@ fun AuthorisationServer(): RoutingHttpHandler {
     return routes(
         "as" bind routes(
             server.tokenRoute,
-            "/jwks" bind GET to { _: Request -> Response(OK).header("content-type", "application-json").body(jwks) },
+            "/jwks" bind GET to { _: Request ->
+                Response(OK)
+                    .with(CONTENT_TYPE of ContentType.APPLICATION_JSON)
+                    .body(jwks)
+            },
             "/userinfo" bind GET to { _: Request -> Response(OK).body("{}") },
             "/authorize" bind GET to server.authenticationStart.then {
                 Response(OK)

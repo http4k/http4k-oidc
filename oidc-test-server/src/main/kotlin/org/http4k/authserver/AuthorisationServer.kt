@@ -34,7 +34,12 @@ fun AuthorisationServer(): RoutingHttpHandler {
     return routes(
         "as" bind routes(
             server.tokenRoute,
-            "/jwks" bind GET to { _: Request -> Response(OK).body("{}") },
+            "/jwks" bind GET to { _: Request -> Response(OK).body("""{"kty":"EC",
+      "crv":"P-256",
+      "x":"f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
+      "y":"x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0",
+      "kid":"Public key used in JWS spec Appendix A.3 example"
+     }""") },
             "/userinfo" bind GET to { _: Request -> Response(OK).body("{}") },
             "/authorize" bind GET to server.authenticationStart.then {
                 Response(OK)

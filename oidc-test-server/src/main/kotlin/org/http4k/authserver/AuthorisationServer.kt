@@ -1,11 +1,14 @@
 package org.http4k.authserver
 
 import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
+import org.http4k.base64Decoded
 import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Status.Companion.OK
+import org.http4k.filter.ServerFilters
 import org.http4k.format.Jackson
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
@@ -14,6 +17,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.AccessToken
 import org.http4k.security.oauth.server.*
+import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.AuthorizationCodeAccessTokenRequest
 import java.time.Clock
 import java.time.temporal.ChronoUnit.DAYS
@@ -23,10 +27,10 @@ fun AuthorisationServer(): RoutingHttpHandler {
     val server = OAuthServer(
         tokenPath = "/token",
         authRequestTracking = InsecureCookieBasedAuthRequestTracking(),
-        clientValidator = InsecureClientValidator(),
+        authoriseRequestValidator = SimpleAuthoriseRequestValidator(InsecureClientValidator()),
+        accessTokenRequestAuthentication = BasicAuthAccessTokenRequestAuthentication(),
         authorizationCodes = InsecureAuthorizationCodes(),
         accessTokens = InsecureAccessTokens(),
-        json = Jackson,
         clock = Clock.systemUTC(),
     )
 
@@ -88,4 +92,37 @@ class InsecureAccessTokens : AccessTokens {
         authorizationCode: AuthorizationCode
     ) =
         Success(AccessToken(UUID.randomUUID().toString()))
+}
+
+class BasicAuthAccessTokenRequestAuthentication : AccessTokenRequestAuthentication {
+    override fun validateCredentials(
+        request: Request,
+        tokenRequest: TokenRequest
+    ) =
+        Success(
+            Triple(
+                request,
+                request.basicAuthenticationCredentials()?.user?.let(::ClientId) ?: ClientId(""),
+                tokenRequest
+            )
+        )
+
+    private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")
+        ?.trim()
+        ?.takeIf { it.startsWith("Basic") }
+        ?.substringAfter("Basic")
+        ?.trim()
+        ?.safeBase64Decoded()
+        ?.toCredentials()
+
+    private fun String.safeBase64Decoded(): String? = try {
+        base64Decoded()
+    } catch (e: IllegalArgumentException) {
+        null
+    }
+
+    private fun String.toCredentials(): Credentials =
+        split(":", ignoreCase = false, limit = 2)
+            .let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
+
 }

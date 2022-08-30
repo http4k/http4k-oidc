@@ -47,8 +47,11 @@ fun AuthorisationServer(): RoutingHttpHandler {
             },
             "/userinfo" bind GET to { _: Request -> Response(OK).body("{}") },
             "/authorize" bind GET to server.authenticationStart.then {
+                // browser interaction can be controlled by test via
+                // https://gitlab.com/openid/conformance-suite/-/wikis/Design/BrowserControl
+                // (must be added to Test Plan configuration)
                 Response(OK)
-                    .body("""<html><form method="POST"><button type="submit" name="login">Please authenticate</button></form></html>""")
+                    .body("""<html><body><form method="POST"><button type="submit" id="perform_login">Please authenticate</button></form></body></html>""")
             },
             "/authorize" bind POST to server.authenticationComplete,
             "/" bind { _: Request -> Response(OK).body("Authorisation server") }

@@ -64,7 +64,7 @@ class TestIdTokens : IdTokens {
         authorizationCodeDetails: AuthorizationCodeDetails,
         code: AuthorizationCode,
         accessToken: AccessToken
-    ): IdToken = IdToken(idToken(Nonce("ignored")))
+    ): IdToken = IdToken(idToken(authorizationCodeDetails.nonce ?: Nonce("ignored-for-access-token")))
 
     override fun createForAuthorization(
         request: Request,
@@ -72,7 +72,7 @@ class TestIdTokens : IdTokens {
         response: Response,
         nonce: Nonce?,
         code: AuthorizationCode
-    ): IdToken = IdToken(idToken(nonce?:Nonce("ignored-for-auth")))
+    ): IdToken = IdToken(idToken(nonce ?: Nonce("ignored-for-auth")))
 
 }
 

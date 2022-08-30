@@ -1,16 +1,12 @@
 package org.http4k.authserver
 
 import dev.forkhandles.result4k.Failure
-import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import org.http4k.base64Decoded
 import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Status.Companion.OK
-import org.http4k.filter.ServerFilters
-import org.http4k.format.Jackson
-import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
@@ -64,7 +60,12 @@ class TestIdTokens : IdTokens {
         authorizationCodeDetails: AuthorizationCodeDetails,
         code: AuthorizationCode,
         accessToken: AccessToken
-    ): IdToken = IdToken(idToken(authorizationCodeDetails.nonce ?: Nonce("ignored-for-access-token")))
+    ): IdToken = IdToken(
+        idToken(
+            authorizationCodeDetails.nonce ?: Nonce("ignored-for-access-token"),
+            authorizationCodeDetails.clientId
+        )
+    )
 
     override fun createForAuthorization(
         request: Request,
@@ -72,7 +73,7 @@ class TestIdTokens : IdTokens {
         response: Response,
         nonce: Nonce?,
         code: AuthorizationCode
-    ): IdToken = IdToken(idToken(nonce ?: Nonce("ignored-for-auth")))
+    ): IdToken = IdToken(idToken(nonce ?: Nonce("ignored-for-auth"), authRequest.client))
 
 }
 

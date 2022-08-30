@@ -9,12 +9,13 @@ import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import org.http4k.security.Nonce
+import org.http4k.security.oauth.server.ClientId
 import java.util.*
 
 
 val jwks by lazy { JWKSet.load(object {}::class.java.getResourceAsStream("/jwks.json")).toPublicJWKSet().toString() }
 
-fun idToken(nonce: Nonce): String {
+fun idToken(nonce: Nonce, clientId: ClientId): String {
     val key = String(
         object {}::class.java.getResourceAsStream("/http4k-oidc-rsa.pem")?.readAllBytes()
             ?: error("could not load private key")
@@ -25,6 +26,7 @@ fun idToken(nonce: Nonce): String {
         .subject("alice")
         .issuer("https://http4k-oidc.herokuapp.com/as")
         .claim("nonce", nonce.value)
+        .claim("aud", clientId.value)
         .expirationTime(Date(Date().time + 60 * 1000))
         .build()
     val signedJWT = SignedJWT(
@@ -37,5 +39,5 @@ fun idToken(nonce: Nonce): String {
 }
 
 fun main() {
-    println(idToken(Nonce("bob")))
+    println(idToken(Nonce("bob"), ClientId("carl")))
 }

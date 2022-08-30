@@ -1,7 +1,8 @@
 package conformance.authserver.core
 
-import conformance.assertPassed
+import conformance.assertPassedWithWarning
 import org.http4k.*
+import org.http4k.TestStatus.FINISHED
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.lens.uri
@@ -31,15 +32,19 @@ class ConformanceTests {
 
         return tests.map { testDefinition ->
             DynamicTest.dynamicTest(testDefinition.displayName.value) {
-                val testInfo = conformance.createTestFromPlan(planId, testDefinition.testName)
+                val testInfo = conformance.createTestFromPlan(
+                    planId,
+                    testDefinition.testName,
+                    TestStatus.values().toSet()
+                )
                 runTest(testInfo)
             }
         }
     }
 
     private fun runTest(testInfo: TestInfo) {
-        conformance.waitForStatus(testInfo.testId, testInfo.testName, TestStatus.FINISHED, Duration.ofSeconds(7)) {
+        conformance.waitForStatus(testInfo.testId, testInfo.testName, FINISHED, Duration.ofSeconds(10)) {
             fail("Timed out waiting for test to finish. Full logs: ${testInfo.logs}\n")
-        }.assertPassed()
+        }.assertPassedWithWarning()
     }
 }

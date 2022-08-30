@@ -6,7 +6,6 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.forkhandles.values.StringValue
 import dev.forkhandles.values.ValueFactory
 import org.http4k.ConformanceJackson.auto
-import org.http4k.TestStatus.WAITING
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.*
 import org.http4k.core.Method.GET
@@ -33,13 +32,13 @@ class Conformance(apiToken: ApiToken) {
     fun fetchAvailableTests(): List<TestDefinition> =
         availableTestsResponse(client(Request(GET, "/api/runner/available")))
 
-    fun createTestFromPlan(planId: PlanId, testName: TestName) =
+    fun createTestFromPlan(planId: PlanId, testName: TestName, waitUntil: Set<TestStatus>) =
         testId(
             client(
                 Request(POST, "/api/runner").query("plan", planId.value).query("test", testName.value)
             )
         ).let {
-            waitForStatus(it, testName, WAITING, Duration.ofSeconds(5))
+            waitForStatus(it, testName, waitUntil, Duration.ofSeconds(5))
         }
 
     fun getTestInfo(testId: TestId, testName: TestName) =
@@ -51,12 +50,20 @@ class Conformance(apiToken: ApiToken) {
         testName: TestName,
         status: TestStatus,
         duration: Duration,
-        onTimeout: (e: TimeoutException) -> Nothing = { throw(it) }
+        onTimeout: (e: TimeoutException) -> Nothing = { throw (it) }
+    ): TestInfo = waitForStatus(testId, testName, setOf(status), duration, onTimeout)
+
+    private fun waitForStatus(
+        testId: TestId,
+        testName: TestName,
+        statuses: Set<TestStatus>,
+        duration: Duration,
+        onTimeout: (e: TimeoutException) -> Nothing = { throw (it) }
     ): TestInfo {
         val future = CompletableFuture<TestInfo>()
         val executor = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
             val currentStatus = getTestInfo(testId, testName)
-            if (currentStatus.status == status) {
+            if (currentStatus.status in statuses) {
                 future.complete(currentStatus)
             }
         }, 0, 1, SECONDS)
@@ -107,11 +114,11 @@ data class TestInfo(
 )
 
 enum class TestStatus {
-    CREATED, WAITING, INTERRUPTED, FINISHED
+    CREATED, WAITING, RUNNING, INTERRUPTED, FINISHED
 }
 
 enum class TestResult {
-    PASSED, FAILED
+    PASSED, FAILED, WARNING
 }
 
 data class TestCreationResponse(val id: TestId)

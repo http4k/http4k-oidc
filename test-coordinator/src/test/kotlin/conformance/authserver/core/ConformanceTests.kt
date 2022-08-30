@@ -24,7 +24,7 @@ class ConformanceTests {
     @TestFactory
     fun `execute test plan`(): List<DynamicTest> {
         val testsToRun = listOf<TestName>(
-//            TestName.of("oidcc-server"),
+            TestName.of("oidcc-server"),
         )
 
         val tests = conformance.fetchAvailableTests().filter { it.testName in testsToRun }

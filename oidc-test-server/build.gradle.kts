@@ -20,6 +20,7 @@ dependencies {
     implementation("dev.forkhandles:values4k:_")
     implementation("io.jsonwebtoken:jjwt-api:_")
     implementation("com.nimbusds:nimbus-jose-jwt:_")
+    implementation("org.bouncycastle:bcpkix-jdk15on:_")
     testImplementation(Http4k.testing.hamkrest)
     testImplementation(Testing.junit.jupiter.api)
     testImplementation(Testing.junit.jupiter.engine)

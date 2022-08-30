@@ -7,6 +7,8 @@ import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.cookie.Cookie
+import org.http4k.core.cookie.cookie
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
@@ -24,7 +26,7 @@ import java.util.*
 fun AuthorisationServer(): RoutingHttpHandler {
     val server = OAuthServer(
         tokenPath = "/token",
-        authRequestTracking = InsecureCookieBasedAuthRequestTracking(),
+        authRequestTracking = SlightlyMoreSecureCookieBasedAuthRequestTracking(),
         authoriseRequestValidator = SimpleAuthoriseRequestValidator(InsecureClientValidator()),
         accessTokenRequestAuthentication = BasicAuthAccessTokenRequestAuthentication(),
         authorizationCodes = InsecureAuthorizationCodes(),
@@ -150,4 +152,24 @@ class BasicAuthAccessTokenRequestAuthentication : AccessTokenRequestAuthenticati
         split(":", ignoreCase = false, limit = 2)
             .let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
 
+}
+
+class SlightlyMoreSecureCookieBasedAuthRequestTracking : AuthRequestTracking {
+    private val cookieName = "OauthFlowId"
+
+    override fun trackAuthRequest(request: Request, authRequest: AuthRequest, response: Response): Response =
+        response.cookie(Cookie(cookieName, authRequest.serialise()))
+
+    override fun resolveAuthRequest(request: Request): AuthRequest? =
+        request.cookie(cookieName)?.value
+            ?.let { Request(GET, Uri.of("dummy").query(it)) }?.authorizationRequest()
+
+    private fun AuthRequest.serialise() = Request(GET, "dummy")
+        .with(OAuthServer.clientIdQueryParameter of client)
+        .with(OAuthServer.redirectUriQueryParameter of redirectUri!!)
+        .with(OAuthServer.scopesQueryParameter of scopes)
+        .with(OAuthServer.state of state)
+        .with(OAuthServer.responseType of responseType)
+        .with(OAuthServer.nonce of nonce)
+        .uri.query
 }

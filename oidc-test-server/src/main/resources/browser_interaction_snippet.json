@@ -1,0 +1,32 @@
+{
+  "browser": [
+    {
+      "match": "https://http4k-oidc.herokuapp.com/as/authorize*",
+      "tasks": [
+        {
+          "task": "Initial Login",
+          "match": "https://http4k-oidc.herokuapp.com/as/authorize*",
+          "commands": [
+            [
+              "click",
+              "id",
+              "perform_login"
+            ]
+          ]
+        },
+        {
+          "task": "Verify Complete",
+          "match": "https://*/test/a/*/callback*",
+          "commands": [
+            [
+              "wait",
+              "id",
+              "submission_complete",
+              10
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

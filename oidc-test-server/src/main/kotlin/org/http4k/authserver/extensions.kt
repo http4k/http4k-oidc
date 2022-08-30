@@ -22,13 +22,18 @@ fun idToken(nonce: Nonce, clientId: ClientId): String {
     )
     val jwtKey = RSAKey.parseFromPEMEncodedObjects(key).toRSAKey()
     val signer: JWSSigner = RSASSASigner(jwtKey)
+    val issueTime = Date()
+    val expiresInSeconds = 60
+    val expirationTime = Date(issueTime.time + (expiresInSeconds * 1000))
     val claimsSet = JWTClaimsSet.Builder()
         .subject("alice")
         .issuer("https://http4k-oidc.herokuapp.com/as")
         .claim("nonce", nonce.value)
+        .claim("expires_in", expiresInSeconds)
         .audience(clientId.value)
-        .issueTime(Date())
-        .expirationTime(Date(Date().time + 60 * 1000))
+        .issueTime(issueTime)
+        .expirationTime(expirationTime)
+
         .build()
     val signedJWT = SignedJWT(
         JWSHeader.Builder(JWSAlgorithm.RS256).keyID(jwtKey.keyID).build(),

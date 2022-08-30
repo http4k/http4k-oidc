@@ -23,7 +23,7 @@ fun idToken(nonce: Nonce): String {
     val signer: JWSSigner = RSASSASigner(jwtKey)
     val claimsSet = JWTClaimsSet.Builder()
         .subject("alice")
-        .issuer("https://http4k-oidc.herokuapp.com")
+        .issuer("https://http4k-oidc.herokuapp.com/as")
         .claim("nonce", nonce.value)
         .expirationTime(Date(Date().time + 60 * 1000))
         .build()

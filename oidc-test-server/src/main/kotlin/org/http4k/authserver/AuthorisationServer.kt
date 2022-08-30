@@ -101,7 +101,8 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
                 authRequest.redirectUri!!,
                 clock.instant().plus(1, DAYS),
                 authRequest.state,
-                authRequest.isOIDC()
+                authRequest.isOIDC(),
+                nonce = authRequest.nonce
             )
         })
 }

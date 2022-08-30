@@ -26,7 +26,8 @@ fun idToken(nonce: Nonce, clientId: ClientId): String {
         .subject("alice")
         .issuer("https://http4k-oidc.herokuapp.com/as")
         .claim("nonce", nonce.value)
-        .claim("aud", clientId.value)
+        .audience(clientId.value)
+        .issueTime(Date())
         .expirationTime(Date(Date().time + 60 * 1000))
         .build()
     val signedJWT = SignedJWT(

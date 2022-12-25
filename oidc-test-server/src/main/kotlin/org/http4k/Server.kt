@@ -57,5 +57,5 @@ fun main() {
     val printingApp = stack.then(allAps)
     val server = printingApp.asServer(Undertow(port(environment).value)).start()
 
-    println("Server started on " + server.port())
+    println("Server started on port " + server.port())
 }

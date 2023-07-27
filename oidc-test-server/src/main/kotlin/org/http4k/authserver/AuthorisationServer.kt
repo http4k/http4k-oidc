@@ -1,6 +1,7 @@
 package org.http4k.authserver
 
 import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import org.http4k.base64Decoded
 import org.http4k.core.*
@@ -111,6 +112,12 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
 
 class InsecureAccessTokens : AccessTokens {
     override fun create(clientId: ClientId, tokenRequest: TokenRequest) =
+        Failure(UnsupportedGrantType("client_credentials"))
+
+    override fun create(
+        clientId: ClientId,
+        tokenRequest: AuthorizationCodeAccessTokenRequest
+    ): Result<AccessToken, AccessTokenError> =
         Failure(UnsupportedGrantType("client_credentials"))
 
     override fun create(

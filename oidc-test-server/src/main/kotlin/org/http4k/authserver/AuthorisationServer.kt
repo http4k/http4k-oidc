@@ -111,8 +111,13 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
 }
 
 class InsecureAccessTokens : AccessTokens {
-    override fun create(clientId: ClientId, tokenRequest: TokenRequest) =
-        Failure(UnsupportedGrantType("client_credentials"))
+    override fun create(clientId: ClientId, tokenRequest: TokenRequest): Result<AccessToken, AccessTokenError> =
+        Success(AccessToken(UUID.randomUUID().toString()))
+
+    override fun create(
+        clientId: ClientId,
+        tokenRequest: AuthorizationCodeAccessTokenRequest
+    ) = Success(AccessToken(UUID.randomUUID().toString()))
 
     override fun create(
         clientId: ClientId,

@@ -3,7 +3,7 @@ plugins {
 }
 
 application {
-    mainClassName = "org.http4k.ServerKt"
+    mainClass = "org.http4k.ServerKt"
 }
 
 dependencies {

@@ -30,14 +30,14 @@ subprojects {
 
     kotlin {
         jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(21))
+            languageVersion.set(JavaLanguageVersion.of(11))
         }
         jvmToolchain(21)
     }
 
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(21))
+            languageVersion.set(JavaLanguageVersion.of(11))
         }
     }
 
@@ -46,6 +46,4 @@ subprojects {
             useJUnitPlatform()
         }
     }
-
-
 }

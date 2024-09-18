@@ -3,8 +3,8 @@ package conformance.authserver.core
 import conformance.assertPassedWithWarning
 import org.http4k.*
 import org.http4k.TestStatus.FINISHED
-import org.http4k.cloudnative.env.Environment
-import org.http4k.cloudnative.env.EnvironmentKey
+import org.http4k.config.Environment
+import org.http4k.config.EnvironmentKey
 import org.http4k.lens.uri
 import org.http4k.lens.value
 import org.junit.jupiter.api.DynamicTest

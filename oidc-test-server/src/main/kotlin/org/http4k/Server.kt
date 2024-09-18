@@ -5,9 +5,9 @@ import org.http4k.Config.oauthCredentials
 import org.http4k.Config.port
 import org.http4k.authserver.AuthorisationServer
 import org.http4k.client.JavaHttpClient
-import org.http4k.cloudnative.env.Environment
-import org.http4k.cloudnative.env.EnvironmentKey
-import org.http4k.cloudnative.env.Port
+import org.http4k.config.Environment
+import org.http4k.config.EnvironmentKey
+import org.http4k.config.Port
 import org.http4k.core.Credentials
 import org.http4k.core.Uri
 import org.http4k.core.extend

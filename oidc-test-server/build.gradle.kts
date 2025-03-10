@@ -22,6 +22,9 @@ dependencies {
     implementation("com.nimbusds:nimbus-jose-jwt:_")
     implementation("org.bouncycastle:bcpkix-jdk15on:_")
     testImplementation(Http4k.testing.hamkrest)
-    testImplementation(Testing.junit.jupiter.api)
-    testImplementation(Testing.junit.jupiter.engine)
+
+    testApi(platform("org.junit:junit-bom:_"))
+    testApi("org.junit.platform:junit-platform-launcher")
+    testApi("org.junit.jupiter:junit-jupiter-api")
+    testApi("org.junit.jupiter:junit-jupiter-engine")
 }

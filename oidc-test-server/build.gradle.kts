@@ -11,7 +11,7 @@ dependencies {
     implementation(Http4k.client.okhttp)
     implementation(Http4k.core)
     implementation(Http4k.format.jackson)
-    implementation(Http4k.cloudnative)
+    implementation("org.http4k:http4k-config")
     implementation(Http4k.securityOauth)
 //    implementation(project(":oidc"))
     implementation("dev.forkhandles:result4k:_")

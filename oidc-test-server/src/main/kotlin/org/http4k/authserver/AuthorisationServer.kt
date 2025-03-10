@@ -118,13 +118,6 @@ class InsecureAccessTokens : AccessTokens {
         clientId: ClientId,
         tokenRequest: AuthorizationCodeAccessTokenRequest
     ) = Success(AccessToken(UUID.randomUUID().toString()))
-
-    override fun create(
-        clientId: ClientId,
-        tokenRequest: AuthorizationCodeAccessTokenRequest,
-        authorizationCode: AuthorizationCode
-    ) =
-        Success(AccessToken(UUID.randomUUID().toString()))
 }
 
 class BasicAuthAccessTokenRequestAuthentication : AccessTokenRequestAuthentication {

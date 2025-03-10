@@ -12,6 +12,6 @@ jobs:
       - name: Build
         env:
           CONFORMANCE_API_TOKEN: ${{secrets.CONFORMANCE_API_TOKEN}}
-          CONFORMANCE_PLAN_ID: dwlqjOmA1u897
+          CONFORMANCE_PLAN_ID: 6aJ57GEWsAPJk
           CONFORMANCE_RELYING_PARTY_BASE_URI: https://http4k-oidc.herokuapp.com
         run: ./gradlew :test-coordinator:conformanceTestsRelyingParty

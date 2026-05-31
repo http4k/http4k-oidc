@@ -39,7 +39,7 @@ class Conformance(apiToken: ApiToken) {
             )
         ).let {
             waitForStatus(it, testName, waitUntil, Duration.ofSeconds(5))
-        }
+        }.also { println("Test created. Full logs: ${it.logs}\n") }
 
     fun getTestInfo(testId: TestId, testName: TestName) =
         testInfoResponse(client(Request(GET, "/api/info/${testId.value}")))

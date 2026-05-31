@@ -37,7 +37,6 @@ class ConformanceTests {
                     testDefinition.testName,
                     TestStatus.values().toSet()
                 )
-                println("Test created. Full logs: ${testInfo.logs}\n")
                 runTest(testInfo)
             }
         }

@@ -28,15 +28,21 @@ flowchart TD
     action1["🎬 actions<br/>checkout"]
     style action1 fill:#e1f5fe,stroke:#0277bd
     step1 -.-> action1
-    step2["Step 2: Build<br/>💻 bash"]
-    style step2 fill:#f3e5f5,stroke:#7b1fa2
+    step2["Step 2: Setup Java"]
+    style step2 fill:#f8f9fa,stroke:#495057
+    action2["🎬 actions<br/>setup-java<br/><br/>📝 Inputs:<br/>• cache: gradle"]
+    style action2 fill:#e1f5fe,stroke:#0277bd
+    step2 -.-> action2
     step1 --> step2
-    step3["Step 3: Deploy<br/>🔐 if: github.ref == 'refs/heads/main'"]
-    style step3 fill:#f8f9fa,stroke:#495057
-    action3["🎬 akhileshns<br/>heroku-deploy<br/><br/>📝 Inputs:<br/>• heroku_api_key: ${{ secrets.HTTP4K_OIDC_HEROKU...<br/>• heroku_app_name: http4k-oidc<br/>• heroku_email: ivan@gourame.com<br/>• healthcheck: https://http4k-oidc.herokuapp...."]
-    style action3 fill:#e1f5fe,stroke:#0277bd
-    step3 -.-> action3
+    step3["Step 3: Build<br/>💻 bash"]
+    style step3 fill:#f3e5f5,stroke:#7b1fa2
     step2 --> step3
+    step4["Step 4: Deploy<br/>🔐 if: github.ref == 'refs/heads/main'"]
+    style step4 fill:#f8f9fa,stroke:#495057
+    action4["🎬 akhileshns<br/>heroku-deploy<br/><br/>📝 Inputs:<br/>• heroku_api_key: ${{ secrets.HTTP4K_OIDC_HEROKU...<br/>• heroku_app_name: http4k-oidc<br/>• heroku_email: ivan@gourame.com<br/>• healthcheck: https://http4k-oidc.herokuapp...."]
+    style action4 fill:#e1f5fe,stroke:#0277bd
+    step4 -.-> action4
+    step3 --> step4
 ```
 
 **Step Types Legend:**

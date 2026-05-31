@@ -5,6 +5,9 @@ import io.typeflows.github.workflow.Workflow
 import io.typeflows.github.workflow.step.RunCommand
 import io.typeflows.github.workflow.step.UseAction
 import io.typeflows.github.workflow.step.marketplace.Checkout
+import io.typeflows.github.workflow.step.marketplace.JavaDistribution
+import io.typeflows.github.workflow.step.marketplace.JavaVersion
+import io.typeflows.github.workflow.step.marketplace.SetupJava
 import io.typeflows.github.workflow.trigger.Push
 import io.typeflows.github.workflow.trigger.WorkflowDispatch
 import io.typeflows.util.Builder
@@ -20,6 +23,9 @@ class BuildAndDeployWorkflow : Builder<Workflow> {
             displayName = "Build & Deploy"
 
             steps += Checkout()
+            steps += SetupJava(JavaDistribution.Temurin, JavaVersion.V21) {
+                with += mapOf("cache" to "gradle")
+            }
             steps += RunCommand("./gradlew check") {
                 name = "Build"
             }

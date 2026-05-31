@@ -18,6 +18,7 @@ plugins {
 }
 
 repositories {
+    maven { url = uri("libs") }
     mavenCentral()
 }
 
@@ -25,6 +26,7 @@ subprojects {
     apply(plugin = "kotlin")
 
     repositories {
+        maven { url = uri("${rootProject.projectDir}/libs") }
         mavenCentral()
     }
 

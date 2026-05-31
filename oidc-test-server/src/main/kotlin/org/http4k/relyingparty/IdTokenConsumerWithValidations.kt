@@ -10,6 +10,7 @@ import com.nimbusds.jose.proc.JWSKeySelector
 import com.nimbusds.jose.proc.JWSVerificationKeySelector
 import com.nimbusds.jose.proc.SecurityContext
 import com.nimbusds.jwt.JWTClaimsSet
+import com.nimbusds.jwt.JWTParser
 import com.nimbusds.jwt.PlainJWT
 import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier
 import com.nimbusds.jwt.proc.DefaultJWTProcessor
@@ -62,6 +63,11 @@ class IdTokenConsumerWithValidations : IdTokenConsumer {
 
     override fun consumeFromAuthorizationResponse(idToken: IdToken): Result<Unit, InvalidIdToken> = Success(Unit)
 
-    override fun nonceFromIdToken(idToken: IdToken): Nonce? = null
+    override fun nonceFromIdToken(idToken: IdToken): Nonce? = try {
+        JWTParser.parse(idToken.value).jwtClaimsSet.getStringClaim("nonce")?.let(::Nonce)
+    } catch (e: Exception) {
+        println("Failed to parse nonce from id token: ${e.message}")
+        null
+    }
 
 }

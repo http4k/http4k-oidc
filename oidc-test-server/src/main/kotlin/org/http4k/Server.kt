@@ -35,7 +35,7 @@ object Config {
 
 fun main() {
     val environment = Environment.ENV
-    val stack = DebuggingFilters.PrintRequestAndResponse().inIntelliJOnly()
+    val stack = DebuggingFilters.PrintRequestAndResponse()
 
     val client = stack.then(JavaHttpClient())
 

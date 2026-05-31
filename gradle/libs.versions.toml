@@ -1,0 +1,45 @@
+[versions]
+bcpkix = "1.84"
+commons-codec = "1.22.0"
+forkhandles = "2.25.6.0"
+gradle-test-logger = "4.0.0"
+http4k = "6.49.0.0"
+http4k-standards = "1.8.0.0"
+jjwt = "0.13.0"
+junit = "6.1.0"
+kotlin = "2.3.21"
+nimbus-jose-jwt = "10.9.1"
+typeflows = "0.33.0-beta"
+version-catalog-update = "1.1.0"
+
+[libraries]
+bcpkixJdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bcpkix" }
+commonsCodec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
+http4kBom = { module = "org.http4k:http4k-bom", version.ref = "http4k" }
+http4kClientOkhttp = { module = "org.http4k:http4k-client-okhttp" }
+http4kConfig = { module = "org.http4k:http4k-config" }
+http4kCore = { module = "org.http4k:http4k-core" }
+http4kFormatJackson = { module = "org.http4k:http4k-format-jackson" }
+http4kFormatMoshi = { module = "org.http4k:http4k-format-moshi" }
+http4kSecurityCore = { module = "org.http4k:http4k-security-core" }
+http4kSecurityOauth = { module = "org.http4k:http4k-security-oauth" }
+http4kServerUndertow = { module = "org.http4k:http4k-server-undertow" }
+http4kStandards = { module = "org.http4k.standards:typeflows", version.ref = "http4k-standards" }
+http4kTestingHamkrest = { module = "org.http4k:http4k-testing-hamkrest" }
+jjwtApi = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
+junitBom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junitJupiterApi = { module = "org.junit.jupiter:junit-jupiter-api" }
+junitJupiterEngine = { module = "org.junit.jupiter:junit-jupiter-engine" }
+junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
+kotlinStdlibJdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
+nimbusJoseJwt = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus-jose-jwt" }
+result4k = { module = "dev.forkhandles:result4k", version.ref = "forkhandles" }
+typeflowsGithub = { module = "io.typeflows:typeflows-github", version.ref = "typeflows" }
+typeflowsGithubMarketplace = { module = "io.typeflows:typeflows-github-marketplace", version.ref = "typeflows" }
+values4k = { module = "dev.forkhandles:values4k", version.ref = "forkhandles" }
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+testLogger = { id = "com.adarshr.test-logger", version.ref = "gradle-test-logger" }
+typeflows = { id = "io.typeflows", version.ref = "typeflows" }
+versionCatalogUpdate = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }

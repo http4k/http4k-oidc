@@ -1,51 +1,60 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-buildscript {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-    }
-
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
-        classpath("com.adarshr:gradle-test-logger-plugin:_")
-    }
-}
+import org.gradle.api.JavaVersion.VERSION_21
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
 
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.typeflows)
+    alias(libs.plugins.versionCatalogUpdate)
+    java
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
 repositories {
-    maven { url = uri("libs") }
+    mavenLocal()
     mavenCentral()
 }
 
-subprojects {
+allprojects {
+    apply(plugin = "java")
     apply(plugin = "kotlin")
 
     repositories {
-        maven { url = uri("${rootProject.projectDir}/libs") }
+        mavenLocal()
         mavenCentral()
     }
 
-    kotlin {
-        jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(21))
-        }
-        jvmToolchain(21)
-    }
-
-    java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(21))
-        }
-    }
-
     tasks {
+        withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
+            compilerOptions {
+                allWarningsAsErrors = false
+                jvmTarget.set(JVM_21)
+                freeCompilerArgs.add("-jvm-default=enable")
+            }
+        }
+
         withType<Test> {
             useJUnitPlatform()
         }
+
+        java {
+            sourceCompatibility = VERSION_21
+            targetCompatibility = VERSION_21
+        }
     }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+    failOnNoDiscoveredTests = false
+}
+
+dependencies {
+    typeflowsApi(libs.typeflowsGithub)
+    typeflowsApi(libs.typeflowsGithubMarketplace)
+    typeflowsApi(libs.http4kStandards)
 }

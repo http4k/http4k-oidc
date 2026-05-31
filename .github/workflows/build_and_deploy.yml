@@ -1,21 +1,21 @@
 name: Build & Deploy
-
-on: push
-
+on:
+  push:
+  workflow_dispatch:
 jobs:
   build:
-    name: Build & Deploy
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Build
-        run: ./gradlew check
-      - name: Deploy
-        if: github.ref == 'refs/heads/main'
-        uses: akhileshns/heroku-deploy@v3.13.15
-        with:
-          heroku_api_key: ${{secrets.HTTP4K_OIDC_HEROKU_API_KEY}}
-          heroku_app_name: "http4k-oidc"
-          heroku_email: "ivan@gourame.com"
-          healthcheck: "https://http4k-oidc.herokuapp.com/health"
+    - name: Checkout
+      uses: actions/checkout@v6.0.2
+    - name: Build
+      run: ./gradlew check
+      shell: bash
+    - name: Deploy
+      if: github.ref == 'refs/heads/main'
+      uses: akhileshns/heroku-deploy@v3.13.15
+      with:
+        heroku_api_key: ${{ secrets.HTTP4K_OIDC_HEROKU_API_KEY }}
+        heroku_app_name: http4k-oidc
+        heroku_email: ivan@gourame.com
+        healthcheck: https://http4k-oidc.herokuapp.com/health

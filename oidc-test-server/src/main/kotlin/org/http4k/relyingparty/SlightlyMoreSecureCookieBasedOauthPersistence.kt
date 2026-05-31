@@ -4,7 +4,7 @@ import com.nimbusds.jose.JOSEObject
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.PlainObject
 import com.nimbusds.jose.jwk.source.JWKSource
-import com.nimbusds.jose.jwk.source.RemoteJWKSet
+import com.nimbusds.jose.jwk.source.JWKSourceBuilder
 import com.nimbusds.jose.proc.BadJOSEException
 import com.nimbusds.jose.proc.JWSKeySelector
 import com.nimbusds.jose.proc.JWSVerificationKeySelector
@@ -15,7 +15,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.security.*
 import org.http4k.security.openid.IdToken
-import java.net.URL
+import java.net.URI
 
 
 class SlightlyMoreSecureCookieBasedOauthPersistence(
@@ -34,7 +34,7 @@ class SlightlyMoreSecureCookieBasedOauthPersistence(
         //performing validations as described in spec: https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.3.1.3.7
 
         val keySource: JWKSource<SecurityContext> =
-            RemoteJWKSet(URL("https://www.certification.openid.net/test/a/http4k-oidc/jwks"))
+            JWKSourceBuilder.create<SecurityContext>(URI.create("https://www.certification.openid.net/test/a/http4k-oidc/jwks").toURL()).build()
         val expectedJWSAlg = JWSAlgorithm.RS256
 
         val keySelector: JWSKeySelector<SecurityContext> =

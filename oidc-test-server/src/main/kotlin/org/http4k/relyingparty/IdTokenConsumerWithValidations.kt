@@ -4,7 +4,7 @@ import com.nimbusds.jose.JOSEObject
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.PlainObject
 import com.nimbusds.jose.jwk.source.JWKSource
-import com.nimbusds.jose.jwk.source.RemoteJWKSet
+import com.nimbusds.jose.jwk.source.JWKSourceBuilder
 import com.nimbusds.jose.proc.BadJOSEException
 import com.nimbusds.jose.proc.JWSKeySelector
 import com.nimbusds.jose.proc.JWSVerificationKeySelector
@@ -21,14 +21,14 @@ import org.http4k.security.Nonce
 import org.http4k.security.OAuthCallbackError.InvalidIdToken
 import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
-import java.net.URL
+import java.net.URI
 
 class IdTokenConsumerWithValidations : IdTokenConsumer {
     override fun consumeFromAccessTokenResponse(idToken: IdToken): Result<Unit, InvalidIdToken> {
         //performing validations as described in spec: https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.3.1.3.7
 
         val keySource: JWKSource<SecurityContext> =
-            RemoteJWKSet(URL("https://www.certification.openid.net/test/a/http4k-oidc/jwks"))
+            JWKSourceBuilder.create<SecurityContext>(URI.create("https://www.certification.openid.net/test/a/http4k-oidc/jwks").toURL()).build()
         val expectedJWSAlg = JWSAlgorithm.RS256
 
         val keySelector: JWSKeySelector<SecurityContext> =
@@ -50,7 +50,7 @@ class IdTokenConsumerWithValidations : IdTokenConsumer {
 
         val jwtProcessor = DefaultJWTProcessor<SecurityContext>().apply {
             jwtClaimsSetVerifier = claimsVerifier
-            setJWSKeySelector(keySelector)
+            jwsKeySelector = keySelector
         }
         return try {
             jwtProcessor.process(idToken.value, null)

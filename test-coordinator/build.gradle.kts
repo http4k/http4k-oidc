@@ -1,31 +1,35 @@
 import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 
-apply(plugin = "com.adarshr.test-logger")
+plugins {
+    alias(libs.plugins.testLogger)
+}
 
 dependencies {
-    api(platform(Http4k.bom))
-    implementation(Http4k.client.okhttp)
-    implementation(Http4k.core)
-    implementation(Http4k.format.jackson)
-    implementation("org.http4k:http4k-config")
-    implementation(Http4k.securityOauth)
-    implementation(Http4k.server.undertow)
-    implementation(Kotlin.stdlib.jdk8)
-    implementation("dev.forkhandles:values4k:_")
-    implementation("io.jsonwebtoken:jjwt-api:_")
-    implementation("com.nimbusds:nimbus-jose-jwt:_")
-    testImplementation(Http4k.testing.hamkrest)
-    testApi(platform("org.junit:junit-bom:_"))
-    testApi("org.junit.platform:junit-platform-launcher")
-    testApi("org.junit.jupiter:junit-jupiter-api")
-    testApi("org.junit.jupiter:junit-jupiter-engine")
+    api(platform(libs.http4kBom))
+    implementation(libs.http4kClientOkhttp)
+    implementation(libs.http4kCore)
+    implementation(libs.http4kFormatJackson)
+    implementation(libs.http4kConfig)
+    implementation(libs.http4kSecurityOauth)
+    implementation(libs.http4kServerUndertow)
+    implementation(libs.kotlinStdlibJdk8)
+    implementation(libs.values4k)
+    implementation(libs.jjwtApi)
+    implementation(libs.nimbusJoseJwt)
+    testImplementation(libs.http4kTestingHamkrest)
+    testApi(platform(libs.junitBom))
+    testApi(libs.junitPlatformLauncher)
+    testApi(libs.junitJupiterApi)
+    testApi(libs.junitJupiterEngine)
 }
 
 tasks.test {
     filter {
         exclude("conformance/**")
+        isFailOnNoMatchingTests = false
     }
+    failOnNoDiscoveredTests = false
 }
 
 configure<TestLoggerExtension> {
@@ -45,7 +49,7 @@ configure<TestLoggerExtension> {
     showPassedStandardStreams = true
     showSkippedStandardStreams = true
     showFailedStandardStreams = true
-    logLevel =  LogLevel.LIFECYCLE
+    logLevel = LogLevel.LIFECYCLE
 }
 
 tasks.register<Test>("conformanceTestsRelyingParty") {

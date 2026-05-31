@@ -41,7 +41,7 @@ configure<TestLoggerExtension> {
     showSkipped = true
     showFailed = true
     showOnlySlow = false
-    showStandardStreams = false
+    showStandardStreams = true
     showPassedStandardStreams = true
     showSkippedStandardStreams = true
     showFailedStandardStreams = true
